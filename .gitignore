@@ -30,3 +30,9 @@ models/finbert/
 # OS
 .DS_Store
 Thumbs.db
+
+# SQLite WAL-mode sidecars
+*.sqlite-shm
+*.sqlite-wal
+*.sqlite-journal
+db/
