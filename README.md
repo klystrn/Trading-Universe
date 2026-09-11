@@ -89,7 +89,10 @@ Pick a host:
 
 - **Render (free, no card):** New → Blueprint → select this repo. `render.yaml`
   does the rest and you get an `https://…onrender.com` URL. Free instances
-  sleep when idle and take ~40s to wake.
+  sleep after 15 idle minutes, so `.github/workflows/keepalive.yml` pings the
+  demo every 10 minutes to keep it warm (set a repository variable `DEMO_URL`
+  if your URL differs). When a cold start does happen, the HUD loads at once
+  and shows "Waking up" with the bootstrap stage until the first scan lands.
 - **Fly.io:** `fly launch --copy-config --yes && fly deploy` (uses `fly.toml`).
 - **Anywhere that runs a container:** every push to `main` publishes
   `ghcr.io/klystrn/trading-universe:latest` via GitHub Actions, so

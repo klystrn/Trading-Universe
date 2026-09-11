@@ -5,7 +5,7 @@
  */
 
 import { create } from "zustand";
-import { api } from "@/lib/api";
+import { api, isWakingError } from "@/lib/api";
 import type {
   Briefing, PanelId, Portfolio, Recommendation, Signal, StrategyInfo,
   SystemHealth, WatchlistEntry,
@@ -26,6 +26,10 @@ interface TradingState {
   chartTicker: string | null;
   loading: boolean;
   error: string | null;
+  /** The backend is starting (container boot or first scan); not an error. */
+  waking: boolean;
+  wakeStage: string | null;
+  wakeSince: number | null;
 
   setSignals: (signals: Signal[], generatedAt: string | null) => void;
   setHealth: (health: SystemHealth) => void;
@@ -35,7 +39,12 @@ interface TradingState {
   closePanel: () => void;
   openChartFor: (ticker: string) => void;
 
+  /** First load: ask /api/system/status whether the scan has landed before
+   *  firing six requests that would all 503 on a cold instance. */
+  boot: () => Promise<void>;
   refreshAll: () => Promise<void>;
+  /** Poll /api/system/status until the first scan lands, then refresh. */
+  waitForBackend: () => Promise<void>;
   refreshStrategies: () => Promise<void>;
   refreshPortfolio: () => Promise<void>;
   refreshWatchlist: () => Promise<void>;
@@ -59,6 +68,9 @@ export const useTradingStore = create<TradingState>((set, get) => ({
   chartTicker: null,
   loading: false,
   error: null,
+  waking: false,
+  wakeStage: null,
+  wakeSince: null,
 
   setSignals: (signals, signalsGeneratedAt) => set({ signals, signalsGeneratedAt }),
   setHealth: (health) => set({ health }),
@@ -68,6 +80,24 @@ export const useTradingStore = create<TradingState>((set, get) => ({
     set((s) => ({ openPanel: s.openPanel === panel ? null : panel })),
   closePanel: () => set({ openPanel: null }),
   openChartFor: (ticker) => set({ chartTicker: ticker, openPanel: "charts" }),
+
+  boot: async () => {
+    try {
+      const status = await api.status();
+      if (status.bootstrap && !status.bootstrap.ready) {
+        set({ waking: true, wakeSince: Date.now(), wakeStage: status.bootstrap.stage });
+        await get().waitForBackend();
+        return;
+      }
+    } catch (error) {
+      if (isWakingError(error)) {
+        set({ waking: true, wakeSince: Date.now(), wakeStage: "starting the server" });
+        await get().waitForBackend();
+        return;
+      }
+    }
+    await get().refreshAll();
+  },
 
   refreshAll: async () => {
     set({ loading: true, error: null });
@@ -98,10 +128,44 @@ export const useTradingStore = create<TradingState>((set, get) => ({
       } catch {
         set({ recommendation: null });
       }
+      set({ waking: false, wakeStage: null, wakeSince: null });
     } catch (error) {
-      set({ error: error instanceof Error ? error.message : "request failed" });
+      if (isWakingError(error)) {
+        // A sleeping free-tier instance or a cold first scan. Say so and keep
+        // asking rather than flashing an error at the visitor.
+        if (!get().waking) {
+          set({ waking: true, wakeSince: Date.now(), wakeStage: null });
+          void get().waitForBackend();
+        }
+      } else {
+        set({ error: error instanceof Error ? error.message : "request failed" });
+      }
     } finally {
       set({ loading: false });
+    }
+  },
+
+  waitForBackend: async () => {
+    // Bounded: after ten minutes of silence this is an outage, not a wake.
+    const deadline = Date.now() + 10 * 60_000;
+    while (get().waking && Date.now() < deadline) {
+      try {
+        const status = await api.status();
+        const boot = status.bootstrap;
+        if (!boot || boot.ready) {
+          set({ waking: false, wakeStage: null, wakeSince: null });
+          await get().refreshAll();
+          return;
+        }
+        set({ wakeStage: boot.error ? `failed: ${boot.error}` : boot.stage });
+        if (boot.error) break;
+      } catch {
+        set({ wakeStage: "starting the server" });
+      }
+      await new Promise((resolve) => setTimeout(resolve, 3_000));
+    }
+    if (get().waking) {
+      set({ waking: false, error: get().wakeStage ?? "backend did not come up" });
     }
   },
 

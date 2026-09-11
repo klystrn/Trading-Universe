@@ -1,8 +1,10 @@
 # Render Blueprint: https://render.com/docs/blueprint-spec
 # Click "New > Blueprint" in Render, point it at this repo, and it builds the
-# Dockerfile and gives you a public https URL. The free tier sleeps after
-# inactivity and wakes on the next request (~40s cold start while the demo
-# market is generated).
+# Dockerfile and gives you a public https URL. The free tier sleeps after 15
+# idle minutes; .github/workflows/keepalive.yml pings it every 10 minutes so
+# visitors do not pay the cold start, and if they do, the HUD serves at once
+# and shows "Waking up" while the first scan runs (the API answers 503 until
+# then, except /api/system/status).
 services:
   - type: web
     name: trading-universe-demo

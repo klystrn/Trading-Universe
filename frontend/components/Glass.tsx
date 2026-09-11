@@ -125,7 +125,7 @@ export function StatusDot({
   const color =
     status === "LIVE" || status === "HEALTHY" || status === "CURRENT"
       ? "bg-live"
-      : status === "DEGRADED"
+      : status === "DEGRADED" || status === "WAKING"
         ? "bg-degraded"
         : status === "STALE" || status === "UNAVAILABLE"
           ? "bg-stale"

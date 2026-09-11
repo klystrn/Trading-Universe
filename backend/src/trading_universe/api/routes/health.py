@@ -31,6 +31,11 @@ def status(platform: Platform = Depends(platform_dep)) -> dict:
     snapshot = platform.health.snapshot()
     last_scan = platform.scanner.last_result
     return {
+        "bootstrap": {
+            "ready": platform.bootstrapped,
+            "stage": platform.bootstrap_stage,
+            "error": platform.bootstrap_error,
+        },
         "moomoo": "CONNECTED" if platform.market_data.connected else "DISCONNECTED",
         "provider": getattr(platform.provider, "name", "unknown"),
         "quotes": snapshot.overall.value,

@@ -3,6 +3,7 @@
 /** The command line: type or hold to talk; replies are shown and spoken. */
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { isWakingError } from "@/lib/api";
 import { route } from "@/lib/intents";
 import { cn } from "@/lib/format";
 import { createRecognizer, recognitionSupported, speak, stopSpeaking } from "@/lib/voice";
@@ -49,7 +50,11 @@ export function CommandLine() {
         speak(speech, () => setSpeaking(true), () => setSpeaking(false));
       }
     } catch (error) {
-      say("tu", error instanceof Error ? `That failed: ${error.message}` : "That failed.");
+      if (isWakingError(error)) {
+        say("tu", "Still waking up. Give me a moment and ask again.");
+      } else {
+        say("tu", error instanceof Error ? `That failed: ${error.message}` : "That failed.");
+      }
     } finally {
       setBusy(false);
     }

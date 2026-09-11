@@ -28,9 +28,10 @@ export function StatusReadouts() {
   const activeStrategy = useTradingStore((s) => s.activeStrategy);
   const signals = useTradingStore((s) => s.signals);
   const connected = useHudStore((s) => s.connected);
+  const waking = useTradingStore((s) => s.waking);
 
   const pf = briefing?.portfolio ?? {};
-  const overall = connected ? (health?.overall ?? "UNAVAILABLE") : "OFFLINE";
+  const overall = waking ? "WAKING" : connected ? (health?.overall ?? "UNAVAILABLE") : "OFFLINE";
   const healthy = overall === "LIVE" || overall === "HEALTHY";
   const canExecute = !!health && !health.kill_switch_engaged && health.operating_mode !== "ADVISORY"
     && (healthy || overall === "DEGRADED");

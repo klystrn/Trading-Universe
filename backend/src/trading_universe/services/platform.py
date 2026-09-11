@@ -70,6 +70,10 @@ class Platform:
         self.last_sync_at: datetime | None = None
         self._lock = threading.RLock()
         self._bootstrapped = False
+        # Surfaced by /api/system/status so a cold-started deployment can tell
+        # the HUD what it is doing instead of leaving it staring at a spinner.
+        self.bootstrap_stage: str = "starting"
+        self.bootstrap_error: str | None = None
 
     # -- construction --------------------------------------------------------
     def _build_provider(self) -> MarketDataProvider:
@@ -111,20 +115,30 @@ class Platform:
     def bootstrap(self, warm_tickers: int | None = None) -> dict[str, Any]:
         """Connect, load history and run the first ingest + scan."""
         with self._lock:
-            self.market_data.connect()
-            self.broker.connect()
-            self.market_data.set_watchlist(self.repository.watchlist_tickers())
+            try:
+                self.bootstrap_stage = "connecting"
+                self.market_data.connect()
+                self.broker.connect()
+                self.market_data.set_watchlist(self.repository.watchlist_tickers())
 
-            tickers = self.universe.tickers()
-            if warm_tickers:
-                tickers = tickers[:warm_tickers]
+                tickers = self.universe.tickers()
+                if warm_tickers:
+                    tickers = tickers[:warm_tickers]
 
-            loaded = self.market_data.warm_candles(tickers)
-            counts = self.ingest.ingest_all(tickers)
-            result = self.scanner.run(tickers, execute=False)
-            self._apply_recommendation_if_unset(result)
-            self.last_sync_at = datetime.now(UTC)
-            self._bootstrapped = True
+                self.bootstrap_stage = f"loading {len(tickers)} candle series"
+                loaded = self.market_data.warm_candles(tickers)
+                self.bootstrap_stage = "ingesting filings, news and congressional data"
+                counts = self.ingest.ingest_all(tickers)
+                self.bootstrap_stage = f"scanning {len(tickers)} tickers"
+                result = self.scanner.run(tickers, execute=False)
+                self._apply_recommendation_if_unset(result)
+                self.last_sync_at = datetime.now(UTC)
+                self._bootstrapped = True
+                self.bootstrap_stage = "ready"
+            except Exception as exc:
+                self.bootstrap_error = str(exc)
+                self.bootstrap_stage = "failed"
+                raise
 
             return {
                 "tickers": len(tickers),

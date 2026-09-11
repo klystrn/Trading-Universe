@@ -20,6 +20,15 @@ export class ApiError extends Error {
   }
 }
 
+/** True when the failure means the backend is still starting rather than
+ *  broken: a network refusal while the container boots, the hosting
+ *  provider's 502/504 while it routes to a waking instance, or our own 503
+ *  "warming up" while the first scan runs. */
+export function isWakingError(error: unknown): boolean {
+  if (error instanceof ApiError) return [502, 503, 504].includes(error.status);
+  return error instanceof TypeError; // fetch() rejects with TypeError on network failure
+}
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${BASE}${path}`, {
     ...init,
@@ -156,7 +165,11 @@ export const api = {
 
   // --- system -------------------------------------------------------------------
   health: () => request<SystemHealth>("/api/system/health"),
-  status: () => request<Record<string, unknown>>("/api/system/status"),
+  status: () =>
+    request<{
+      bootstrap?: { ready: boolean; stage: string; error: string | null };
+      [key: string]: unknown;
+    }>("/api/system/status"),
   freshness: () =>
     request<{
       overall: string;

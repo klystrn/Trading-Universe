@@ -65,6 +65,10 @@ class Settings(BaseSettings):
 
     # --- Storage ------------------------------------------------------------
     database_url: str = Field(default="", alias="TU_DATABASE_URL")
+    # Serve immediately and run the first ingest + scan in the background. The
+    # HUD polls /api/system/status and fills in when the scan lands. Tests turn
+    # this off so a fresh app is fully scanned by the time a request arrives.
+    bootstrap_in_background: bool = Field(default=True, alias="TU_BOOTSTRAP_BACKGROUND")
 
     # --- Server -------------------------------------------------------------
     api_host: str = Field(default="127.0.0.1", alias="TU_API_HOST")

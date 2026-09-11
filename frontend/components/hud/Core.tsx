@@ -37,9 +37,10 @@ export function Core({ size = 340 }: { size?: number }) {
       const t = (now - start) / 1000;
       const { listening, speaking, busy } = useHudStore.getState();
       const regime = useTradingStore.getState().briefing?.market_regime ?? "NEUTRAL";
-      const killed = useTradingStore.getState().health?.kill_switch_engaged ?? false;
+      const { health, waking } = useTradingStore.getState();
+      const killed = health?.kill_switch_engaged ?? false;
       const energy = killed ? 0.2 : (ENERGY[regime] ?? 0.55);
-      const target = speaking ? 1 : listening ? 0.75 : busy ? 0.5 : 0;
+      const target = speaking ? 1 : listening ? 0.75 : busy || waking ? 0.5 : 0;
       amp += (target - amp) * 0.08;
 
       const c = size / 2;

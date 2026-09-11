@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import logging
 from contextlib import asynccontextmanager
 
@@ -33,6 +34,10 @@ from trading_universe.websocket.hub import get_hub
 
 logger = logging.getLogger(__name__)
 
+# Routes that must answer while the first scan is still running: the hosting
+# provider's health check and the HUD's "how far along are you" poll.
+WARM_UP_ALLOWED = frozenset({"/api/system/status"})
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -50,21 +55,32 @@ async def lifespan(app: FastAPI):
 
     platform = get_platform()
     hub = get_hub()
-    import asyncio
-
-    # Bootstrap off the event loop: warming 477 candle series and the first scan
-    # takes seconds, and blocking startup would stall every health probe.
-    await asyncio.to_thread(platform.bootstrap)
-    await hub.broadcast("briefing", platform.briefing())
-
     scheduler = SchedulerService(platform, hub)
-    scheduler.start()
     app.state.platform = platform
     app.state.scheduler = scheduler
+
+    async def warm_up() -> None:
+        # Bootstrap off the event loop: warming 477 candle series and the first
+        # scan takes seconds locally and far longer on a small cloud CPU.
+        await asyncio.to_thread(platform.bootstrap)
+        await hub.broadcast("briefing", platform.briefing())
+        await hub.broadcast("system", platform.health.snapshot().model_dump(mode="json"))
+        scheduler.start()
+
+    if settings.bootstrap_in_background:
+        # Serve the HUD and /api/system/status immediately so a cold-started
+        # deployment shows "warming up" instead of a hosting provider's spinner;
+        # every other /api route answers 503 until the first scan lands.
+        warm_task = asyncio.create_task(warm_up(), name="bootstrap")
+    else:
+        await warm_up()
+        warm_task = None
 
     try:
         yield
     finally:
+        if warm_task is not None and not warm_task.done():
+            warm_task.cancel()
         scheduler.shutdown()
         platform.shutdown()
 
@@ -103,6 +119,23 @@ def create_app() -> FastAPI:
         websocket_routes.router,
     ):
         app.include_router(router)
+
+    @app.middleware("http")
+    async def _warm_up_guard(request: Request, call_next):
+        path = request.url.path
+        if path.startswith("/api/") and path not in WARM_UP_ALLOWED:
+            platform = get_platform()
+            if not platform.bootstrapped:
+                return JSONResponse(
+                    status_code=503,
+                    headers={"Retry-After": "3"},
+                    content={
+                        "detail": "warming up",
+                        "stage": platform.bootstrap_stage,
+                        "error": platform.bootstrap_error,
+                    },
+                )
+        return await call_next(request)
 
     if settings.read_only:
         logger.warning("TU_READ_ONLY=true: all mutating API calls will be refused")

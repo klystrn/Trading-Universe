@@ -11,6 +11,8 @@ import pytest
 os.environ.setdefault("TU_DATA_MODE", "DEMO")
 os.environ.setdefault("TRADING_ENV", "PAPER")
 os.environ.setdefault("ALLOW_REAL_ORDERS", "false")
+# A test app must be fully scanned by the time its first request arrives.
+os.environ.setdefault("TU_BOOTSTRAP_BACKGROUND", "false")
 
 
 @pytest.fixture(autouse=True)

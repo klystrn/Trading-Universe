@@ -20,12 +20,15 @@ import type { Briefing, Signal, SystemHealth } from "@/lib/types";
 
 export default function Page() {
   const refreshAll = useTradingStore((s) => s.refreshAll);
+  const boot = useTradingStore((s) => s.boot);
   const error = useTradingStore((s) => s.error);
+  const waking = useTradingStore((s) => s.waking);
+  const wakeStage = useTradingStore((s) => s.wakeStage);
   const openPanel = useTradingStore((s) => s.openPanel);
   const setConnected = useHudStore((s) => s.setConnected);
 
   useEffect(() => {
-    void refreshAll();
+    void boot();
     const socket = new UniverseSocket(["signals", "system", "briefing"]);
     const offMessage = socket.onMessage((envelope: Envelope) => {
       switch (envelope.channel) {
@@ -47,7 +50,7 @@ export default function Page() {
     socket.connect();
     const poll = setInterval(() => void refreshAll(), 60_000);
     return () => { offMessage(); offStatus(); socket.close(); clearInterval(poll); };
-  }, [refreshAll, setConnected]);
+  }, [boot, refreshAll, setConnected]);
 
   return (
     <main className="relative h-screen w-screen overflow-hidden bg-void">
@@ -67,6 +70,17 @@ export default function Page() {
         <div className="absolute left-1/2 top-[40%] -translate-x-1/2 -translate-y-1/2">
           <Core />
         </div>
+        {waking && (
+          <div className="pointer-events-none absolute left-1/2 top-[63%] z-20 -translate-x-1/2 text-center"
+               data-testid="waking">
+            <p className="font-mono text-[11px] uppercase tracking-[0.3em] text-accent">
+              Waking up
+            </p>
+            <p className="mt-1 font-mono text-[10px] tracking-[0.12em] text-ink-faint">
+              {wakeStage ?? "starting the server"} · the free instance sleeps when idle, this takes about a minute
+            </p>
+          </div>
+        )}
         <StatusReadouts />
         <div className="pointer-events-none absolute inset-x-0 bottom-6 z-20 flex justify-center px-4">
           <CommandLine />
