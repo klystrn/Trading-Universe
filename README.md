@@ -1,15 +1,20 @@
 # Trading Universe
 
-A modular swing-trading bot and research platform whose interface is a
-navigable 3D financial universe — not a dashboard with a decorative background.
+A modular swing-trading bot and research platform behind a Jarvis-style HUD:
+a reactive core, the five questions that matter as readouts around it, and a
+command line that takes text or voice. Panels exist only when summoned.
 
-Sectors are galaxies, subsectors are clusters, stocks are stars. Volume drives
-orbital velocity, price movement drives brightness, qualifying setups pulse and
-attract particles, disclosed political activity draws orbital rings, and held
-positions carry a persistent halo. Underneath, a strictly layered trading
-engine scans the S&P 500 + Nasdaq 100 with eight explainable strategies,
-scores every setup, and hands each one to an independent risk engine that is
-the only path to an order.
+Say or type *briefing*, *show signals*, *chart NVDA*, *why did the bot reject
+NVDA?*, *use recommendation*, *override to oversold reversal*, *stop all
+trading*. Every command is resolved deterministically - UI and control
+commands in the browser, market questions by the backend's own intent matcher
+over live platform state - so every answer is traceable and nothing is
+improvised. Underneath, a strictly layered trading engine scans the S&P 500 +
+Nasdaq 100 with eight explainable strategies, scores every setup, and hands
+each one to an independent risk engine that is the only path to an order.
+
+The earlier 3D universe (sectors as spiral galaxies, stocks as stars) lives in
+`archive/universe/` - see its README to revive it.
 
 ```
 DATA  ->  FEATURES  ->  STRATEGIES  ->  SCORER  ->  REGIME SELECTOR
@@ -60,10 +65,9 @@ npm install                         # .npmrc handles a react-three peer quirk
 npm run dev                         # http://localhost:3000
 ```
 
-Click the universe to fly (`W A S D`, mouse look, `Space` up, `C` down,
-`Shift` boost, `Esc` release). `⌘K` focuses the search bar: type a ticker to
-travel to it, or ask a question — *"Which sector is strongest today?"*,
-*"Why did the bot reject NVDA?"*.
+Type in the command line (`/` focuses it) or hold the mic button / `Ctrl+Space`
+to talk; replies are spoken unless muted. Voice input needs Chrome or Edge;
+everything else works everywhere. `Esc` dismisses a panel or stops speech.
 
 Useful CLI commands:
 
@@ -189,10 +193,11 @@ backend/
     api/           FastAPI routes + WebSocket
   tests/           167 tests
 frontend/
-  universe/        R3F scene: instanced stars, galaxies, particles, flow arcs, fly controls
-  components/      liquid-glass rail, eight panels, search bar, hover card
+  components/hud/  reactive core, status readouts, command line, panel host
+  components/      eight summonable panels, glass primitives
+  lib/intents.ts   deterministic command router; lib/voice.ts speech in/out
   charts/          Lightweight Charts candlesticks with overlays
-  stores/          render state and trading state, kept separate
+archive/universe/  the retired 3D scene, kept for reference
 ```
 
 ## Tests

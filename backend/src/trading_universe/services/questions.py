@@ -58,8 +58,20 @@ _STRATEGY_WORDS = {
 }
 
 
+def _speech(text: str, limit: int = 220) -> str:
+    """A short spoken form: the first sentence or two, trimmed for TTS."""
+    parts = [p.strip() for p in re.split(r"(?<=[.!?])\s+", text) if p.strip()]
+    out = ""
+    for part in parts:
+        if len(out) + len(part) > limit and out:
+            break
+        out = f"{out} {part}".strip()
+    return out or text[:limit]
+
+
 def _answer(kind: str, text: str, **extra: Any) -> dict[str, Any]:
-    return {"intent": kind, "answer": text, **extra}
+    speech = extra.pop("speech", None) or _speech(text)
+    return {"intent": kind, "answer": text, "speech": speech, **extra}
 
 
 def _find_sector(query: str, platform) -> str | None:
@@ -104,6 +116,101 @@ def answer_question(question: str, platform, labels: dict[str, str]) -> dict[str
     ticker = _find_ticker(query, platform)
     strategy_id = _find_strategy(query)
     sectors = sorted(result.sector_regimes, key=lambda s: s.relative_strength, reverse=True)
+
+    # --- briefing / status report -------------------------------------------
+    briefing_words = ("briefing", "status report", "morning report", "good morning",
+                      "daily report", "summary of the day", "what's the plan")
+    if any(w in query for w in briefing_words):
+        b = platform.briefing()
+        pf = b.get("portfolio", {})
+        top = ", ".join(
+            f"{x['ticker']} {x['score']}" for x in b.get("high_confidence_signals", [])[:3]
+        )
+        strongest = ", ".join(
+            x["sector"].replace("_", " ") for x in b.get("strongest_sectors", [])[:2]
+        )
+        counts = b.get("signal_counts", {})
+        text = (
+            f"Regime {b['market_regime'].replace('_', ' ').title()}. "
+            f"Strategy of the day: {b.get('primary_strategy_label') or 'none'} at "
+            f"{round((b.get('confidence') or 0) * 100)} percent confidence. "
+            f"{counts.get('total', 0)} setups found, {counts.get('executable', 0)} executable"
+            + (f", led by {top}. " if top else ". ")
+            + (f"Strongest sectors: {strongest}. " if strongest else "")
+            + f"{pf.get('open_positions', 0)} of {pf.get('max_open_positions', 0)} positions open, "
+            f"{pf.get('remaining_daily_entries', 0)} entries left today."
+        )
+        return _answer("briefing", text, briefing=b, panel="signals", speech=text)
+
+    # --- portfolio ------------------------------------------------------------
+    portfolio_words = ("portfolio", "positions", "how am i doing", "my holdings", "p&l", "pnl")
+    if any(w in query for w in portfolio_words):
+        pf = platform.broker.get_portfolio()
+        risk = platform.config.risk
+        held = ", ".join(
+            f"{p.ticker} {p.unrealized_pnl_pct:+.1%}" for p in pf.positions[:5]
+        ) or "no open positions"
+        text = (
+            f"Portfolio value {pf.portfolio_value:,.0f} dollars, cash {pf.cash:,.0f}. "
+            f"{len(pf.positions)} of {risk.max_open_positions} positions open: {held}. "
+            f"Unrealized {pf.unrealized_pnl:+,.2f}, realized today {pf.realized_pnl_today:+,.2f}."
+        )
+        return _answer("portfolio", text, panel="portfolio")
+
+    # --- capacity ---------------------------------------------------------------
+    if any(w in query for w in ("how many trades", "capacity", "slots", "can i open", "room for")):
+        pf = platform.broker.get_portfolio()
+        risk = platform.config.risk
+        today = getattr(platform.broker, "trades_opened_today", lambda: 0)()
+        slots = max(0, risk.max_open_positions - len(pf.positions))
+        daily = max(0, risk.max_new_trades_per_day - today)
+        text = (
+            f"{slots} position slot{'s' if slots != 1 else ''} free of {risk.max_open_positions}, "
+            f"and {daily} new entr{'ies' if daily != 1 else 'y'} left today of "
+            f"{risk.max_new_trades_per_day}. Max {risk.max_position_value:,.0f} dollars per trade."
+        )
+        return _answer("capacity", text, panel="portfolio")
+
+    # --- active strategy ----------------------------------------------------------
+    strategy_words = ("active strategy", "what strategy", "which strategy",
+                      "strategy of the day", "recommended strategy", "current strategy")
+    if any(w in query for w in strategy_words):
+        active = platform.execution.active_strategy
+        rec = result.recommendation
+        text = f"Active execution strategy: {labels.get(active or '', 'none - NO TRADE')}. "
+        if rec:
+            overridden = active is not None and active != rec.primary_strategy
+            text += (
+                f"Today's recommendation is "
+                f"{labels.get(rec.primary_strategy, rec.primary_strategy)} at "
+                f"{rec.confidence:.0%}"
+                + (" - currently overridden." if overridden else ".")
+            )
+        return _answer("strategy", text, panel="parameters", active=active)
+
+    # --- health / can you execute ----------------------------------------------------
+    health_words = ("can you execute", "can you trade", "data live", "is data", "health",
+                    "systems", "are we live", "system status", "diagnostic")
+    if any(w in query for w in health_words):
+        h = platform.health.snapshot()
+        bad = ("DEGRADED", "STALE", "UNAVAILABLE")
+        degraded = [s.name for s in h.sources if s.status.value in bad]
+        blocked = [k for k, v in h.strategy_gates.items() if v != "MAY TRADE"]
+        kill = "engaged" if h.kill_switch_engaged else "clear"
+        text = (
+            f"Data {h.overall.value.lower()}. Mode {h.operating_mode.replace('_', ' ')}, "
+            f"environment {h.trading_env}, kill switch {kill}. "
+        )
+        if degraded:
+            text += f"Degraded sources: {', '.join(degraded)}. "
+        else:
+            text += "All sources healthy. "
+        if blocked:
+            plural = "ies" if len(blocked) != 1 else "y"
+            text += f"{len(blocked)} strateg{plural} gated by freshness."
+        else:
+            text += "Every strategy may trade."
+        return _answer("health", text, panel="system", health=h.model_dump(mode="json"))
 
     # --- why was X rejected ------------------------------------------------
     if ticker and any(w in query for w in ("reject", "not trade", "why not", "blocked")):

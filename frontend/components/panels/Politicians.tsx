@@ -4,24 +4,21 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { api } from "@/lib/api";
-import { useUniverseStore } from "@/stores/useUniverseStore";
+import { useTradingStore } from "@/stores/useTradingStore";
 import { cn, compact, titleize } from "@/lib/format";
 import { EmptyState, PanelHeader, Pill } from "../Glass";
 import type { PoliticalTransaction } from "@/lib/types";
 
 export function PoliticiansPanel() {
-  const focusOn = useUniverseStore((s) => s.focusOn);
-  const setFilter = useUniverseStore((s) => s.setFilter);
+  const openChartFor = useTradingStore((s) => s.openChartFor);
   const [rows, setRows] = useState<PoliticalTransaction[]>([]);
   const [summary, setSummary] = useState<Record<string, unknown> | null>(null);
   const [query, setQuery] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setFilter("POLITICAL");
     api.politicalSummary().then(setSummary).catch(() => {});
-    return () => setFilter("MARKET");
-  }, [setFilter]);
+  }, []);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -105,7 +102,7 @@ export function PoliticiansPanel() {
               <div key={row.transaction_id} className="px-5 py-3">
                 <div className="flex items-baseline justify-between gap-2">
                   <button
-                    onClick={() => row.in_universe && focusOn(row.ticker)}
+                    onClick={() => row.in_universe && openChartFor(row.ticker)}
                     className={cn(
                       "font-mono text-sm",
                       row.in_universe ? "text-ink hover:text-accent" : "text-ink-faint",

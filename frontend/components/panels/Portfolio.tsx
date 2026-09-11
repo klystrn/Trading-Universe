@@ -5,14 +5,13 @@
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import { useTradingStore } from "@/stores/useTradingStore";
-import { useUniverseStore } from "@/stores/useUniverseStore";
 import { changeColor, num, signedPct, titleize, usd } from "@/lib/format";
 import { EmptyState, Meter, PanelHeader, Stat } from "../Glass";
 
 export function PortfolioPanel() {
   const portfolio = useTradingStore((s) => s.portfolio);
   const refresh = useTradingStore((s) => s.refreshPortfolio);
-  const focusOn = useUniverseStore((s) => s.focusOn);
+  const openChartFor = useTradingStore((s) => s.openChartFor);
   const [strategyTable, setStrategyTable] = useState<Record<string, unknown>[]>([]);
 
   useEffect(() => {
@@ -106,7 +105,7 @@ export function PortfolioPanel() {
               {portfolio.positions.map((position) => (
                 <button
                   key={position.ticker}
-                  onClick={() => focusOn(position.ticker)}
+                  onClick={() => openChartFor(position.ticker)}
                   className="w-full rounded-lg border border-glass-edge px-3 py-2.5 text-left transition-colors hover:border-accent/35 hover:bg-glass"
                 >
                   <div className="flex items-baseline justify-between gap-2">

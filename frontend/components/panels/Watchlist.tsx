@@ -9,7 +9,6 @@
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import { useTradingStore } from "@/stores/useTradingStore";
-import { useUniverseStore } from "@/stores/useUniverseStore";
 import { titleize, usd } from "@/lib/format";
 import { EmptyState, PanelHeader, Pill } from "../Glass";
 
@@ -17,8 +16,6 @@ export function WatchlistPanel() {
   const watchlist = useTradingStore((s) => s.watchlist);
   const refresh = useTradingStore((s) => s.refreshWatchlist);
   const openChartFor = useTradingStore((s) => s.openChartFor);
-  const focusOn = useUniverseStore((s) => s.focusOn);
-  const setFilter = useUniverseStore((s) => s.setFilter);
 
   const [ticker, setTicker] = useState("");
   const [note, setNote] = useState("");
@@ -26,10 +23,7 @@ export function WatchlistPanel() {
 
   useEffect(() => {
     void refresh();
-    // Opening the watchlist emphasises watched names in the universe (spec 57).
-    setFilter("WATCHLIST");
-    return () => setFilter("MARKET");
-  }, [refresh, setFilter]);
+  }, [refresh]);
 
   const add = async () => {
     if (!ticker.trim()) return;
@@ -92,7 +86,7 @@ export function WatchlistPanel() {
               <div key={entry.ticker} className="px-5 py-3">
                 <div className="flex items-baseline justify-between gap-2">
                   <button
-                    onClick={() => focusOn(entry.ticker)}
+                    onClick={() => openChartFor(entry.ticker)}
                     className="font-mono text-sm text-ink hover:text-accent"
                   >
                     {entry.ticker}

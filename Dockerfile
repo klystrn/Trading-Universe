@@ -8,7 +8,7 @@
 
 FROM node:22-slim AS frontend
 WORKDIR /app/frontend
-COPY frontend/package.json frontend/package-lock.json* frontend/.npmrc ./
+COPY frontend/package.json frontend/package-lock.json* ./
 RUN npm ci --no-audit --no-fund
 COPY frontend/ ./
 ENV STATIC_EXPORT=1 \

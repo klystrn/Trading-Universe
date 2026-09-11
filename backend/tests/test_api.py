@@ -313,3 +313,27 @@ class TestPortfolioAndAnalytics:
     def test_political_summary_states_the_disclosure_caveat(self, client):
         body = client.get("/api/political/summary").json()
         assert "DISCLOSURE date" in body["note"]
+
+
+class TestAssistantIntents:
+    @pytest.mark.parametrize(
+        "question,intent,panel",
+        [
+            ("Give me the briefing", "briefing", "signals"),
+            ("How is my portfolio?", "portfolio", "portfolio"),
+            ("How many trades can I open?", "capacity", "portfolio"),
+            ("What strategy is active?", "strategy", "parameters"),
+            ("Can you execute right now?", "health", "system"),
+        ],
+    )
+    def test_assistant_intents_answer_and_summon_a_panel(self, client, question, intent, panel):
+        body = client.get("/api/search/ask", params={"q": question}).json()
+        assert body["intent"] == intent, body
+        assert body["panel"] == panel
+        assert body["answer"]
+
+    def test_every_answer_carries_a_short_spoken_form(self, client):
+        for q in ("Which sector is strongest today?", "Give me the briefing", "what is gold doing"):
+            body = client.get("/api/search/ask", params={"q": q}).json()
+            assert body["speech"]
+            assert len(body["speech"]) <= 260

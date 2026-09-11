@@ -8,7 +8,6 @@
 
 import { useMemo, useState } from "react";
 import { useTradingStore } from "@/stores/useTradingStore";
-import { useUniverseStore } from "@/stores/useUniverseStore";
 import { api } from "@/lib/api";
 import { cn, humanizeReason, num, relativeTime } from "@/lib/format";
 import { EmptyState, PanelHeader, Pill } from "../Glass";
@@ -19,7 +18,6 @@ export function SignalsPanel() {
   const generatedAt = useTradingStore((s) => s.signalsGeneratedAt);
   const strategies = useTradingStore((s) => s.strategies);
   const openChartFor = useTradingStore((s) => s.openChartFor);
-  const focusOn = useUniverseStore((s) => s.focusOn);
 
   const [strategyFilter, setStrategyFilter] = useState("");
   const [executableOnly, setExecutableOnly] = useState(false);
@@ -47,11 +45,8 @@ export function SignalsPanel() {
     setNearMisses(data.near_misses);
   };
 
-  const select = (signal: Signal) => {
-    // Clicking a candidate focuses the universe on that entity (spec 40).
-    focusOn(signal.ticker);
+  const select = (signal: Signal) =>
     setExpanded(expanded === signal.signal_id ? null : signal.signal_id);
-  };
 
   return (
     <div className="flex h-full flex-col">

@@ -1,79 +1,36 @@
 "use client";
 
-/** Trading Universe.
+/** Trading Universe - the HUD.
  *
- *  Layout (spec 33-34): the 3D universe owns the whole viewport. A narrow
- *  liquid-glass rail sits on the left; one card at a time expands from it. A
- *  floating search bar sits centre-top, a briefing strip beside it, filters
- *  along the bottom, navigation hints bottom-right.
+ *  A dark instrument: a reactive core in the centre, the questions that matter
+ *  (regime, strategy, positions, execution, data) as readouts around it, and a
+ *  command line at the bottom that takes text or voice. Panels exist only when
+ *  summoned. No WebGL.
  */
 
-import dynamic from "next/dynamic";
-import { useEffect, useRef } from "react";
-import { BriefingStrip } from "@/components/Briefing";
-import { GlassPanel } from "@/components/Glass";
-import { HoverCard } from "@/components/HoverCard";
-import { Rail } from "@/components/Rail";
-import { SearchBar } from "@/components/SearchBar";
-import { ChartsPanel } from "@/components/panels/Charts";
-import { ParametersPanel } from "@/components/panels/Parameters";
-import { PoliticiansPanel } from "@/components/panels/Politicians";
-import { PortfolioPanel } from "@/components/panels/Portfolio";
-import { SignalsPanel } from "@/components/panels/Signals";
-import { SystemPanel } from "@/components/panels/System";
-import { TradeLogPanel } from "@/components/panels/TradeLog";
-import { WatchlistPanel } from "@/components/panels/Watchlist";
-import { api } from "@/lib/api";
+import { useEffect } from "react";
+import { CommandLine } from "@/components/hud/CommandLine";
+import { Core } from "@/components/hud/Core";
+import { StatusReadouts } from "@/components/hud/StatusReadouts";
+import { Summon } from "@/components/hud/Summon";
 import { UniverseSocket, type Envelope } from "@/lib/ws";
+import { useHudStore } from "@/stores/useHudStore";
 import { useTradingStore } from "@/stores/useTradingStore";
-import { useUniverseStore } from "@/stores/useUniverseStore";
-import { Crosshair, FilterBar, NavigationHud } from "@/universe/camera/NavigationHud";
-import type {
-  Briefing, Signal, SystemHealth, UniversePayload,
-} from "@/lib/types";
-
-// WebGL has no server-side rendering; load the scene on the client only.
-const UniverseScene = dynamic(
-  () => import("@/universe/scene/UniverseScene").then((m) => m.UniverseScene),
-  { ssr: false },
-);
-
-const PANELS = {
-  parameters: ParametersPanel,
-  trades: TradeLogPanel,
-  watchlist: WatchlistPanel,
-  charts: ChartsPanel,
-  politicians: PoliticiansPanel,
-  signals: SignalsPanel,
-  portfolio: PortfolioPanel,
-  system: SystemPanel,
-} as const;
+import type { Briefing, Signal, SystemHealth } from "@/lib/types";
 
 export default function Page() {
-  const openPanel = useTradingStore((s) => s.openPanel);
-  const closePanel = useTradingStore((s) => s.closePanel);
   const refreshAll = useTradingStore((s) => s.refreshAll);
   const error = useTradingStore((s) => s.error);
-  const setPayload = useUniverseStore((s) => s.setPayload);
-  const setConnected = useUniverseStore((s) => s.setConnected);
-  const socketRef = useRef<UniverseSocket | null>(null);
+  const openPanel = useTradingStore((s) => s.openPanel);
+  const setConnected = useHudStore((s) => s.setConnected);
 
   useEffect(() => {
-    // Initial state over HTTP, then live updates over the socket.
     void refreshAll();
-    api.universe().then(setPayload).catch(() => {});
-
-    const socket = new UniverseSocket();
-    socketRef.current = socket;
+    const socket = new UniverseSocket(["signals", "system", "briefing"]);
     const offMessage = socket.onMessage((envelope: Envelope) => {
       switch (envelope.channel) {
-        case "universe":
-          setPayload(envelope.data as UniversePayload);
-          break;
         case "signals": {
           const data = envelope.data as { generated_at: string; signals: Signal[] };
-          // The socket carries a compact signal list; refetch the full one so
-          // the scanner has complete evidence and execution notes.
           void refreshAll();
           useTradingStore.setState({ signalsGeneratedAt: data.generated_at });
           break;
@@ -88,70 +45,41 @@ export default function Page() {
     });
     const offStatus = socket.onStatus(setConnected);
     socket.connect();
-
-    // Belt and braces: the socket can miss a push, so poll slowly as well.
     const poll = setInterval(() => void refreshAll(), 60_000);
-
-    return () => {
-      offMessage();
-      offStatus();
-      socket.close();
-      clearInterval(poll);
-    };
-  }, [refreshAll, setPayload, setConnected]);
-
-  // Escape closes the open panel (after releasing the pointer, handled by the
-  // scene).
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && !document.pointerLockElement) closePanel();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [closePanel]);
-
-  const Panel = openPanel ? PANELS[openPanel] : null;
+    return () => { offMessage(); offStatus(); socket.close(); clearInterval(poll); };
+  }, [refreshAll, setConnected]);
 
   return (
     <main className="relative h-screen w-screen overflow-hidden bg-void">
-      <UniverseScene />
+      {/* Ground: a faint radial so the black has depth without colour. */}
+      <div className="pointer-events-none absolute inset-0"
+           style={{ background: "radial-gradient(ellipse at 50% 45%, rgba(20,27,43,0.9) 0%, #05070d 60%)" }} />
 
-      {/* Top: search centre, briefing strip */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 z-30 flex flex-col items-center gap-2 px-4 pt-4">
-        <SearchBar />
-        <BriefingStrip />
-      </div>
+      <header className="pointer-events-none absolute left-6 top-5 z-20">
+        <p className="font-mono text-[11px] uppercase tracking-[0.42em] text-ink">Trading Universe</p>
+        <p className="mt-0.5 font-mono text-[9px] uppercase tracking-[0.28em] text-ink-faint">advisory intelligence</p>
+      </header>
 
-      {/* Left: rail + expanding card */}
-      <div className="pointer-events-none absolute bottom-4 left-4 top-32 z-30 flex items-stretch gap-3">
-        <div className="self-start">
-          <Rail />
+      {/* When a panel is summoned the HUD keeps its layout but yields the
+          panel's width, so readouts reflow rather than slide off-screen. */}
+      <div className="absolute inset-y-0 left-0 transition-[right] duration-500 ease-calm"
+           style={{ right: openPanel ? "min(460px, calc(100vw - 2rem))" : 0 }}>
+        <div className="absolute left-1/2 top-[40%] -translate-x-1/2 -translate-y-1/2">
+          <Core />
         </div>
-        {Panel && (
-          <GlassPanel className="pointer-events-auto w-[min(440px,calc(100vw-6rem))] overflow-hidden animate-fade-up">
-            <Panel />
-          </GlassPanel>
-        )}
+        <StatusReadouts />
+        <div className="pointer-events-none absolute inset-x-0 bottom-6 z-20 flex justify-center px-4">
+          <CommandLine />
+        </div>
       </div>
 
-      {/* Bottom centre: filters */}
-      <div className="pointer-events-none absolute bottom-5 left-1/2 z-20 -translate-x-1/2">
-        <FilterBar />
-      </div>
-
-      <NavigationHud />
-      <Crosshair />
-      <HoverCard />
+      <Summon />
 
       {error && (
-        <div className="pointer-events-auto absolute bottom-20 right-5 z-40 rounded-xl border border-down/40 bg-down/10 px-4 py-2 text-xs text-down backdrop-blur-glass">
-          Backend unreachable: {error}. Start it with <code>trading-universe serve</code>.
+        <div className="pointer-events-auto absolute right-5 top-5 z-40 rounded-xl border border-down/40 bg-down/10 px-4 py-2 font-mono text-[11px] text-down backdrop-blur-glass">
+          Backend unreachable: {error}
         </div>
       )}
-
-      <h1 className="pointer-events-none absolute bottom-5 left-1/2 hidden -translate-x-1/2 translate-y-8 font-mono text-[9px] uppercase tracking-[0.4em] text-ink-faint/40 lg:block">
-        Trading Universe
-      </h1>
     </main>
   );
 }

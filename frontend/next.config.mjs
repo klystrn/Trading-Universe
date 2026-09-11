@@ -6,8 +6,6 @@ const isExport = process.env.STATIC_EXPORT === "1";
 
 const nextConfig = {
   reactStrictMode: true,
-  // three ships untranspiled ESM examples; Next needs to compile them.
-  transpilePackages: ["three"],
   images: { unoptimized: true },
   ...(isExport
     ? { output: "export" }

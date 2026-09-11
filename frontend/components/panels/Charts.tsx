@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import { CandleChart } from "@/charts/CandleChart";
 import { useTradingStore } from "@/stores/useTradingStore";
-import { useUniverseStore } from "@/stores/useUniverseStore";
 import { num, signedPct, changeColor } from "@/lib/format";
 import { EmptyState, PanelHeader, Pill } from "../Glass";
 import type { CandleResponse } from "@/lib/types";
@@ -15,21 +14,30 @@ export function ChartsPanel() {
   const chartTicker = useTradingStore((s) => s.chartTicker);
   const openChartFor = useTradingStore((s) => s.openChartFor);
   const signals = useTradingStore((s) => s.signals);
-  const focusOn = useUniverseStore((s) => s.focusOn);
-  const entityById = useUniverseStore((s) => s.entityById);
   const [input, setInput] = useState("");
   const [data, setData] = useState<CandleResponse | null>(null);
+  const [detail, setDetail] = useState<{ name: string; price: number | null; change: number } | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!chartTicker) return;
     setError(null);
     setData(null);
+    setDetail(null);
     api.candles(chartTicker).then(setData).catch((e) => setError(e.message));
-    focusOn(chartTicker);
-  }, [chartTicker, focusOn]);
+    api.stock(chartTicker).then((d) => {
+      const stock = d.stock as { name: string };
+      const quote = d.quote as { last: number; change_pct: number } | null;
+      const tech = d.technical as { close: number; change_pct: number } | null;
+      setDetail({
+        name: stock.name,
+        price: quote?.last ?? tech?.close ?? null,
+        change: quote?.change_pct ?? tech?.change_pct ?? 0,
+      });
+    }).catch(() => {});
+  }, [chartTicker]);
 
-  const entity = chartTicker ? entityById.get(chartTicker) : undefined;
+  const entity = detail ? { name: detail.name, price: detail.price, price_change: detail.change } : undefined;
   const signal = signals.find((s) => s.ticker === chartTicker);
   const o = data?.overlays ?? {};
 
