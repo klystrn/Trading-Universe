@@ -22,6 +22,7 @@ import {
 } from "@/universe/particles/SignalParticles";
 import { BackgroundStars, FlowArcs } from "@/universe/particles/FlowArcs";
 import { FlyControls, usePointerLock } from "@/universe/controls/FlyControls";
+import { CrosshairPicker } from "@/universe/controls/CrosshairPicker";
 
 function SceneContents() {
   usePointerLock();
@@ -55,12 +56,13 @@ function SceneContents() {
       {/* Bloom is what turns points of light into stars. Threshold sits above
           the dim arm particles so only cores, bright stars and signals bloom. */}
       <EffectComposer multisampling={0}>
-        <Bloom luminanceThreshold={0.32} luminanceSmoothing={0.35} intensity={1.15}
-               mipmapBlur radius={0.72} />
+        <Bloom luminanceThreshold={0.2} luminanceSmoothing={0.4} intensity={1.7}
+               mipmapBlur radius={0.78} />
         <Vignette eskil={false} offset={0.22} darkness={0.55} />
       </EffectComposer>
 
       <FlyControls />
+      <CrosshairPicker />
       <Preload all />
     </>
   );

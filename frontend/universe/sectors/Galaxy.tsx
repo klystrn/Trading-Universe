@@ -40,9 +40,12 @@ interface GalaxyBuffers {
   colors: Float32Array;
   sizes: Float32Array;
   pulses: Float32Array;
+  dust: { positions: Float32Array; colors: Float32Array; sizes: Float32Array; pulses: Float32Array };
   arms: number;
   tilt: [number, number, number];
 }
+
+const DUST = 3200;
 
 function buildGalaxy(sector: UniverseSector, index: number): GalaxyBuffers {
   const rnd = seeded(index * 7919 + 13);
@@ -56,7 +59,7 @@ function buildGalaxy(sector: UniverseSector, index: number): GalaxyBuffers {
   const hue = new THREE.Color().setHSL(sector.hue / 360, 0.55, 0.6);
   const core = new THREE.Color("#ffe9c9");
   const arm = new THREE.Color("#a9c2ff");
-  const dust = new THREE.Color("#e7a9c0");
+  const pink = new THREE.Color("#e7a9c0");
   const c = new THREE.Color();
 
   for (let i = 0; i < PARTICLES; i += 1) {
@@ -81,9 +84,9 @@ function buildGalaxy(sector: UniverseSector, index: number): GalaxyBuffers {
     // toward the sector hue.
     const dustiness = rnd();
     if (t < 0.18) c.copy(core).lerp(hue, 0.15);
-    else if (dustiness > 0.86) c.copy(dust).lerp(hue, 0.35);
+    else if (dustiness > 0.86) c.copy(pink).lerp(hue, 0.35);
     else c.copy(arm).lerp(hue, 0.4);
-    const brightness = t < 0.18 ? 1.0 : 0.55 + rnd() * 0.45;
+    const brightness = t < 0.18 ? 1.15 : 0.8 + rnd() * 0.5;
     colors[i * 3] = c.r * brightness;
     colors[i * 3 + 1] = c.g * brightness;
     colors[i * 3 + 2] = c.b * brightness;
@@ -92,8 +95,34 @@ function buildGalaxy(sector: UniverseSector, index: number): GalaxyBuffers {
     pulses[i] = 0;
   }
 
+  // Dust lanes: dark particles trailing the inside edge of each arm, in the
+  // plane, so the arm reads as lit gas with an unlit lane behind it.
+  const dust = {
+    positions: new Float32Array(DUST * 3),
+    colors: new Float32Array(DUST * 3),
+    sizes: new Float32Array(DUST),
+    pulses: new Float32Array(DUST),
+  };
+  const dustColor = new THREE.Color("#14090a");
+  for (let i = 0; i < DUST; i += 1) {
+    const t = 0.16 + Math.pow(rnd(), 0.8) * 0.8;
+    const r = t * GALAXY_RADIUS;
+    const armIndex = i % arms;
+    const angle =
+      (r / GALAXY_RADIUS) * turns * Math.PI * 2 +
+      armIndex * ((Math.PI * 2) / arms) -
+      0.32 + gauss(rnd) * 0.06;                                 // trails the arm
+    dust.positions[i * 3] = Math.cos(angle) * r + gauss(rnd) * 1.4;
+    dust.positions[i * 3 + 1] = gauss(rnd) * 0.9;
+    dust.positions[i * 3 + 2] = Math.sin(angle) * r + gauss(rnd) * 1.4;
+    dust.colors[i * 3] = dustColor.r;
+    dust.colors[i * 3 + 1] = dustColor.g;
+    dust.colors[i * 3 + 2] = dustColor.b;
+    dust.sizes[i] = 2.2 + rnd() * 3.4;
+  }
+
   return {
-    positions, colors, sizes, pulses, arms,
+    positions, colors, sizes, pulses, dust, arms,
     // Inclined three-quarter views, varied per galaxy so no two look alike.
     tilt: [-0.55 - rnd() * 0.5, rnd() * Math.PI * 2, (rnd() - 0.5) * 0.5],
   };
@@ -120,11 +149,17 @@ export function Galaxy({ sector, index }: { sector: UniverseSector; index: numbe
 
   const material = useMemo(() => {
     const m = createGlowPointsMaterial(softStarTexture(), {
-      sizeScale: 900, minSize: 1.4, maxSize: 26, opacity: 0.85,
+      sizeScale: 1000, minSize: 1.6, maxSize: 30, opacity: 1.0,
     });
     materialRef.current = m;
     return m;
   }, []);
+  const dustMaterial = useMemo(
+    () => createGlowPointsMaterial(softStarTexture(), {
+      sizeScale: 1000, minSize: 2.0, maxSize: 60, opacity: 0.62, blending: THREE.NormalBlending,
+    }),
+    [],
+  );
 
   // Nucleus brightness follows relative strength: leaders glow, laggards fade.
   const rs = Math.max(-1, Math.min(1, sector.relative_strength * 30));
@@ -144,8 +179,9 @@ export function Galaxy({ sector, index }: { sector: UniverseSector; index: numbe
     if (materialRef.current) {
       materialRef.current.uniforms.uTime.value = state.clock.elapsedTime;
       materialRef.current.uniforms.uPixelRatio.value = gl.getPixelRatio();
-      materialRef.current.uniforms.uOpacity.value = emphasised ? 0.9 : 0.4;
+      materialRef.current.uniforms.uOpacity.value = emphasised ? 1.0 : 0.45;
     }
+    dustMaterial.uniforms.uPixelRatio.value = gl.getPixelRatio();
     if (spinRef.current) {
       // Slow rotation about the galaxy's own axis: alive, never a screensaver.
       spinRef.current.rotation.y += delta * 0.012 * (hovered === sector.id ? 0.15 : 1);
@@ -162,7 +198,7 @@ export function Galaxy({ sector, index }: { sector: UniverseSector; index: numbe
     <group ref={groupRef} position={position}>
       <group rotation={buffers.tilt}>
         <group ref={spinRef}>
-          <points frustumCulled={false} material={material}>
+          <points frustumCulled={false} material={material} renderOrder={1}>
             <bufferGeometry>
               <bufferAttribute attach="attributes-position" args={[buffers.positions, 3]} />
               <bufferAttribute attach="attributes-aColor" args={[buffers.colors, 3]} />
@@ -171,13 +207,24 @@ export function Galaxy({ sector, index }: { sector: UniverseSector; index: numbe
             </bufferGeometry>
           </points>
 
-          <mesh rotation={[-Math.PI / 2, 0, 0]}>
+          {/* Dust lanes draw after the arms (to darken them) and before the
+              stocks (renderOrder 5), which must never be dimmed by dust. */}
+          <points frustumCulled={false} material={dustMaterial} renderOrder={2}>
+            <bufferGeometry>
+              <bufferAttribute attach="attributes-position" args={[buffers.dust.positions, 3]} />
+              <bufferAttribute attach="attributes-aColor" args={[buffers.dust.colors, 3]} />
+              <bufferAttribute attach="attributes-aSize" args={[buffers.dust.sizes, 1]} />
+              <bufferAttribute attach="attributes-aPulse" args={[buffers.dust.pulses, 1]} />
+            </bufferGeometry>
+          </points>
+
+          <mesh rotation={[-Math.PI / 2, 0, 0]} renderOrder={0}>
             <planeGeometry args={[GALAXY_RADIUS * 2.3, GALAXY_RADIUS * 2.3]} />
             <meshBasicMaterial
               map={coreTexture()}
               color={nebulaColor}
               transparent
-              opacity={emphasised ? 0.22 : 0.1}
+              opacity={emphasised ? 0.34 : 0.16}
               depthWrite={false}
               blending={THREE.AdditiveBlending}
               toneMapped={false}
@@ -200,7 +247,7 @@ export function Galaxy({ sector, index }: { sector: UniverseSector; index: numbe
                   map={nebulaTexture(n + 1)}
                   color={nebulaColor}
                   transparent
-                  opacity={(emphasised ? 0.11 : 0.05) * (0.8 + 0.4 * rs)}
+                  opacity={(emphasised ? 0.18 : 0.08) * (0.8 + 0.4 * rs)}
                   depthWrite={false}
                   blending={THREE.AdditiveBlending}
                   toneMapped={false}
@@ -212,7 +259,7 @@ export function Galaxy({ sector, index }: { sector: UniverseSector; index: numbe
       </group>
 
       {/* Nucleus, camera-facing. */}
-      <sprite scale={[coreScale, coreScale, 1]}>
+      <sprite scale={[coreScale, coreScale, 1]} renderOrder={3}>
         <spriteMaterial
           map={coreTexture()}
           color={coreColor}
@@ -226,11 +273,12 @@ export function Galaxy({ sector, index }: { sector: UniverseSector; index: numbe
 
       {/* Invisible pick target for hover / click. */}
       <mesh
-        onPointerOver={(e) => { e.stopPropagation(); setHovered(sector.id); }}
-        onPointerOut={() => setHovered(null)}
-        onClick={(e) => { e.stopPropagation(); focusOn(sector.id); }}
+        userData={{ pick: "sector", id: sector.id }}
+        onPointerOver={(e) => { if (document.pointerLockElement) return; e.stopPropagation(); setHovered(sector.id); }}
+        onPointerOut={() => { if (!document.pointerLockElement) setHovered(null); }}
+        onClick={(e) => { if (document.pointerLockElement) return; e.stopPropagation(); focusOn(sector.id); }}
       >
-        <sphereGeometry args={[18, 12, 12]} />
+        <sphereGeometry args={[22, 12, 12]} />
         <meshBasicMaterial transparent opacity={0} depthWrite={false} />
       </mesh>
 

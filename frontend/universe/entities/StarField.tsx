@@ -131,12 +131,14 @@ export function StarField() {
   });
 
   const onPointerMove = useCallback((event: any) => {
+    if (document.pointerLockElement) return;   // the crosshair picks in fly mode
     event.stopPropagation();
     const e = entities[event.instanceId ?? -1];
     if (e) setHovered(e.id);
   }, [entities, setHovered]);
-  const onPointerOut = useCallback(() => setHovered(null), [setHovered]);
+  const onPointerOut = useCallback(() => { if (!document.pointerLockElement) setHovered(null); }, [setHovered]);
   const onClick = useCallback((event: any) => {
+    if (document.pointerLockElement) return;
     event.stopPropagation();
     const e = entities[event.instanceId ?? -1];
     if (e) select(e.id);
@@ -146,7 +148,7 @@ export function StarField() {
 
   return (
     <group>
-      <points key={`glow-${count}`} ref={pointsRef} frustumCulled={false} material={material}>
+      <points key={`glow-${count}`} ref={pointsRef} frustumCulled={false} material={material} renderOrder={5}>
         <bufferGeometry>
           <bufferAttribute attach="attributes-position" args={[buffers.positions, 3]} />
           <bufferAttribute attach="attributes-aColor" args={[buffers.colors, 3]} />
@@ -160,6 +162,7 @@ export function StarField() {
         ref={meshRef}
         args={[undefined, undefined, count]}
         frustumCulled={false}
+        userData={{ pick: "stock" }}
         onPointerMove={onPointerMove}
         onPointerOut={onPointerOut}
         onClick={onClick}

@@ -67,6 +67,34 @@ export function FilterBar() {
   );
 }
 
+/** The crosshair: visible only in fly mode, brightens and names its target. */
+export function Crosshair() {
+  const flying = useUniverseStore((s) => s.flying);
+  const hovered = useUniverseStore((s) => s.hovered);
+  const entityById = useUniverseStore((s) => s.entityById);
+  const sectorById = useUniverseStore((s) => s.sectorById);
+  if (!flying) return null;
+  const target = hovered ? (sectorById.get(hovered)?.label ?? entityById.get(hovered)?.id ?? null) : null;
+  const armed = target !== null;
+  return (
+    <div className="pointer-events-none absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2">
+      <div className={cn("relative h-8 w-8 transition-transform duration-150 ease-calm", armed && "scale-125")}>
+        {[["top-0", "left-1/2 -translate-x-1/2 h-2 w-px"], ["bottom-0", "left-1/2 -translate-x-1/2 h-2 w-px"],
+          ["left-0", "top-1/2 -translate-y-1/2 w-2 h-px"], ["right-0", "top-1/2 -translate-y-1/2 w-2 h-px"]].map(([a, b]) => (
+          <span key={a} className={cn("absolute", a, b, armed ? "bg-accent shadow-glow" : "bg-ink/70")} />
+        ))}
+        <span className={cn("absolute left-1/2 top-1/2 h-1 w-1 -translate-x-1/2 -translate-y-1/2 rounded-full",
+                            armed ? "bg-accent" : "bg-ink/50")} />
+      </div>
+      {armed && (
+        <div className="absolute left-1/2 top-full mt-2 -translate-x-1/2 whitespace-nowrap rounded-md border border-glass-edge bg-void-100/80 px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.14em] text-accent backdrop-blur-glass">
+          {target} · click
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function NavigationHud() {
   const flying = useUniverseStore((s) => s.flying);
   const clearFocus = useUniverseStore((s) => s.clearFocus);

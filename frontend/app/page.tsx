@@ -27,7 +27,7 @@ import { api } from "@/lib/api";
 import { UniverseSocket, type Envelope } from "@/lib/ws";
 import { useTradingStore } from "@/stores/useTradingStore";
 import { useUniverseStore } from "@/stores/useUniverseStore";
-import { FilterBar, NavigationHud } from "@/universe/camera/NavigationHud";
+import { Crosshair, FilterBar, NavigationHud } from "@/universe/camera/NavigationHud";
 import type {
   Briefing, Signal, SystemHealth, UniversePayload,
 } from "@/lib/types";
@@ -140,6 +140,7 @@ export default function Page() {
       </div>
 
       <NavigationHud />
+      <Crosshair />
       <HoverCard />
 
       {error && (

@@ -14,6 +14,8 @@ export function createGlowPointsMaterial(map: THREE.Texture, options?: {
   minSize?: number;
   maxSize?: number;
   opacity?: number;
+  /** Additive for light; normal + premultiplied for dust, which must DARKEN. */
+  blending?: THREE.Blending;
 }): THREE.ShaderMaterial {
   return new THREE.ShaderMaterial({
     uniforms: {
@@ -61,7 +63,10 @@ export function createGlowPointsMaterial(map: THREE.Texture, options?: {
     transparent: true,
     depthWrite: false,
     depthTest: true,
-    blending: THREE.AdditiveBlending,
+    blending: options?.blending ?? THREE.AdditiveBlending,
+    // The fragment shader outputs premultiplied colour, so normal blending
+    // must be told so; otherwise dust would tint instead of darken.
+    premultipliedAlpha: options?.blending === THREE.NormalBlending,
     toneMapped: false,
   });
 }
