@@ -25,6 +25,12 @@ tiers:
     scan_interval_seconds: 15
     data: [daily_candles, intraday_candles, realtime_quote, orderbook]
 
+# How often subscribed quotes are refreshed and positions marked to market.
+# Must sit inside freshness.yaml's quote_active_candidate warn threshold (3s),
+# otherwise a polling feed reads STALE for most of every interval. A push feed
+# (Moomoo subscriptions) updates continuously regardless of this value.
+quote_refresh_seconds: 3
+
 # Watchlisted names are always promoted to at least `focus` tier.
 # They receive scan PRIORITY but never a score bonus (spec 69).
 watchlist_min_tier: focus

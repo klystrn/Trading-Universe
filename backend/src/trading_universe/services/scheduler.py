@@ -30,8 +30,9 @@ class SchedulerService:
         self._loop: asyncio.AbstractEventLoop | None = None
 
     def start(self) -> None:
-        tiers = get_config().universe.tiers
-        quote_interval = int(tiers.get("candidate", {}).get("scan_interval_seconds", 15))
+        universe_cfg = get_config().universe
+        tiers = universe_cfg.tiers
+        quote_interval = int(universe_cfg.get("quote_refresh_seconds", 3))
         scan_interval = int(tiers.get("focus", {}).get("scan_interval_seconds", 60))
         broad_interval = int(tiers.get("broad", {}).get("scan_interval_seconds", 900))
 
