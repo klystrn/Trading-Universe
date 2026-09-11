@@ -11,6 +11,7 @@ import { useFrame } from "@react-three/fiber";
 import { useMemo, useRef } from "react";
 import * as THREE from "three";
 import { useUniverseStore } from "@/stores/useUniverseStore";
+import { softStarTexture } from "@/universe/render/textures";
 
 function arcCurve(from: THREE.Vector3, to: THREE.Vector3): THREE.QuadraticBezierCurve3 {
   const mid = new THREE.Vector3().addVectors(from, to).multiplyScalar(0.5);
@@ -102,7 +103,7 @@ export function FlowArcs() {
                 new THREE.LineBasicMaterial({
                   color: new THREE.Color("#5ad1e6"),
                   transparent: true,
-                  opacity: 0.16 * base * (0.5 + arc.strength * 0.5),
+                  opacity: 0.025 * base * (0.5 + arc.strength * 0.5),
                   depthWrite: false,
                   toneMapped: false,
                 }),
@@ -125,7 +126,7 @@ export function FlowArcs() {
           size={0.9}
           color="#9df0ff"
           transparent
-          opacity={0.28 * base}
+          opacity={0.07 * base}
           sizeAttenuation
           depthWrite={false}
           blending={THREE.AdditiveBlending}
@@ -136,41 +137,66 @@ export function FlowArcs() {
   );
 }
 
-/** A faint static starfield far behind everything, purely for depth. */
-export function BackgroundStars({ count = 1400 }: { count?: number }) {
-  const positions = useMemo(() => {
-    const array = new Float32Array(count * 3);
-    for (let i = 0; i < count; i += 1) {
-      // Distribute on a large shell so parallax reads as distance.
-      const theta = Math.random() * Math.PI * 2;
-      const phi = Math.acos(2 * Math.random() - 1);
-      const r = 1400 + Math.random() * 900;
-      array[i * 3] = r * Math.sin(phi) * Math.cos(theta);
-      array[i * 3 + 1] = r * Math.cos(phi) * 0.55;
-      array[i * 3 + 2] = r * Math.sin(phi) * Math.sin(theta);
-    }
-    return array;
-  }, [count]);
+/** The deep sky: three layers of distant stars at different sizes and tints,
+ *  plus a faint band of dense faint stars, so the universe has depth and the
+ *  galaxies sit in something rather than on black. */
+export function BackgroundStars() {
+  const layers = useMemo(() => {
+    let seed = 12345;
+    const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+    const make = (count: number, rMin: number, rMax: number, band: number) => {
+      const positions = new Float32Array(count * 3);
+      const colors = new Float32Array(count * 3);
+      const c = new THREE.Color();
+      for (let i = 0; i < count; i += 1) {
+        const theta = rnd() * Math.PI * 2;
+        // `band` squeezes a share of stars toward the plane: a milky way.
+        const inBand = rnd() < band;
+        const phi = inBand
+          ? Math.PI / 2 + (rnd() - 0.5) * 0.35
+          : Math.acos(2 * rnd() - 1);
+        const r = rMin + rnd() * (rMax - rMin);
+        positions[i * 3] = r * Math.sin(phi) * Math.cos(theta);
+        positions[i * 3 + 1] = r * Math.cos(phi) * 0.7;
+        positions[i * 3 + 2] = r * Math.sin(phi) * Math.sin(theta);
+        // Mostly white with a scatter of blue and amber stars.
+        const kind = rnd();
+        if (kind < 0.12) c.setHSL(0.6, 0.6, 0.78);
+        else if (kind < 0.2) c.setHSL(0.09, 0.6, 0.75);
+        else c.setHSL(0.62, 0.08, 0.72 + rnd() * 0.28);
+        const b = 0.35 + rnd() * 0.65;
+        colors[i * 3] = c.r * b; colors[i * 3 + 1] = c.g * b; colors[i * 3 + 2] = c.b * b;
+      }
+      return { positions, colors, count };
+    };
+    return [
+      { ...make(9000, 2400, 3600, 0.55), size: 1.1, opacity: 0.55 },
+      { ...make(2600, 2200, 3400, 0.35), size: 1.9, opacity: 0.75 },
+      { ...make(500, 2000, 3200, 0.2), size: 3.0, opacity: 0.9 },
+    ];
+  }, []);
 
   return (
-    <points frustumCulled={false}>
-      <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          args={[positions, 3]}
-          count={count}
-          itemSize={3}
-        />
-      </bufferGeometry>
-      <pointsMaterial
-        size={1.3}
-        color="#7d8aa6"
-        transparent
-        opacity={0.32}
-        sizeAttenuation={false}
-        depthWrite={false}
-        toneMapped={false}
-      />
-    </points>
+    <group>
+      {layers.map((layer, i) => (
+        <points key={i} frustumCulled={false}>
+          <bufferGeometry>
+            <bufferAttribute attach="attributes-position" args={[layer.positions, 3]} />
+            <bufferAttribute attach="attributes-color" args={[layer.colors, 3]} />
+          </bufferGeometry>
+          <pointsMaterial
+            size={layer.size}
+            map={softStarTexture()}
+            vertexColors
+            transparent
+            opacity={layer.opacity}
+            sizeAttenuation={false}
+            depthWrite={false}
+            blending={THREE.AdditiveBlending}
+            toneMapped={false}
+          />
+        </points>
+      ))}
+    </group>
   );
 }

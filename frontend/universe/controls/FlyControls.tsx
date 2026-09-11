@@ -13,12 +13,15 @@ import { useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import { useUniverseStore } from "@/stores/useUniverseStore";
 
-const BASE_SPEED = 42;
+const BASE_SPEED = 80;
 const BOOST = 3.2;
 const PRECISE = 0.3;
 // High damping is what makes the camera stop the instant a key is released.
 const DAMPING = 9.0;
-const LOOK_SENSITIVITY = 0.0022;
+// Was 0.0022 - far too twitchy. Input is also smoothed toward a target
+// orientation each frame rather than applied raw.
+const LOOK_SENSITIVITY = 0.0009;
+const LOOK_SMOOTHING = 16.0;
 const MAX_PITCH = Math.PI / 2 - 0.08;
 
 export function FlyControls({ enabled = true }: { enabled?: boolean }) {
@@ -30,6 +33,7 @@ export function FlyControls({ enabled = true }: { enabled?: boolean }) {
   const velocity = useRef(new THREE.Vector3());
   const euler = useRef(new THREE.Euler(0, 0, 0, "YXZ"));
   const pointerLocked = useRef(false);
+  const lookTarget = useRef<{ yaw: number; pitch: number } | null>(null);
   const travel = useRef<{
     from: THREE.Vector3;
     to: THREE.Vector3;
@@ -65,11 +69,15 @@ export function FlyControls({ enabled = true }: { enabled?: boolean }) {
 
     const onMouseMove = (e: MouseEvent) => {
       if (!pointerLocked.current) return;
-      euler.current.setFromQuaternion(camera.quaternion);
-      euler.current.y -= e.movementX * LOOK_SENSITIVITY;
-      euler.current.x -= e.movementY * LOOK_SENSITIVITY;
-      euler.current.x = Math.max(-MAX_PITCH, Math.min(MAX_PITCH, euler.current.x));
-      camera.quaternion.setFromEuler(euler.current);
+      if (!lookTarget.current) {
+        euler.current.setFromQuaternion(camera.quaternion);
+        lookTarget.current = { yaw: euler.current.y, pitch: euler.current.x };
+      }
+      // Accumulate into a target; the frame loop eases toward it.
+      lookTarget.current.yaw -= e.movementX * LOOK_SENSITIVITY;
+      lookTarget.current.pitch = Math.max(
+        -MAX_PITCH, Math.min(MAX_PITCH, lookTarget.current.pitch - e.movementY * LOOK_SENSITIVITY),
+      );
       // Any manual look cancels a guided transition: travel is interruptible
       // (spec 55).
       travel.current = null;
@@ -79,13 +87,14 @@ export function FlyControls({ enabled = true }: { enabled?: boolean }) {
       pointerLocked.current = document.pointerLockElement === canvas;
       setFlying(pointerLocked.current);
       if (!pointerLocked.current) keys.current = {};
+      lookTarget.current = null;
     };
 
     const onWheel = (e: WheelEvent) => {
       camera.getWorldDirection(forward);
       // Scroll dollies along the view axis rather than changing FOV, which
       // keeps the sense of physical presence in the scene.
-      camera.position.addScaledVector(forward, -e.deltaY * 0.12);
+      camera.position.addScaledVector(forward, -e.deltaY * 0.25);
       travel.current = null;
     };
 
@@ -110,11 +119,14 @@ export function FlyControls({ enabled = true }: { enabled?: boolean }) {
   useEffect(() => {
     if (!focusTarget) return;
     const to = new THREE.Vector3(...focusTarget.position);
-    // Stop short of the target so it sits in front of the camera, not inside it.
+    // Stop short of the target so it sits in front of the camera, not inside
+    // it: a whole galaxy needs far more standoff than a single star.
+    const isSector = useUniverseStore.getState().sectorById.has(focusTarget.id);
     const offset = new THREE.Vector3()
       .subVectors(camera.position, to)
       .normalize()
-      .multiplyScalar(26);
+      .multiplyScalar(isSector ? 260 : 26);
+    if (isSector) offset.y += 120;
     travel.current = {
       from: camera.position.clone(),
       to: to.clone().add(offset),
@@ -142,12 +154,21 @@ export function FlyControls({ enabled = true }: { enabled?: boolean }) {
       euler.current.setFromQuaternion(camera.quaternion);
       if (trip.t >= 1) {
         travel.current = null;
+        lookTarget.current = null;
         // Free navigation resumes immediately on arrival (spec 55).
       }
       return;
     }
 
     if (!enabled) return;
+
+    if (lookTarget.current) {
+      euler.current.setFromQuaternion(camera.quaternion);
+      const k = 1 - Math.exp(-LOOK_SMOOTHING * dt);
+      euler.current.y += (lookTarget.current.yaw - euler.current.y) * k;
+      euler.current.x += (lookTarget.current.pitch - euler.current.x) * k;
+      camera.quaternion.setFromEuler(euler.current);
+    }
 
     const k = keys.current;
     let speed = BASE_SPEED;

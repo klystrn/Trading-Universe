@@ -46,7 +46,7 @@ def _offset(index: int, total: int, radius: float, seed: float = 0.0) -> list[fl
     theta = GOLDEN_ANGLE * i + seed
     return [
         round(radius * math.sin(phi) * math.cos(theta), 3),
-        round(radius * math.cos(phi) * 0.55, 3),  # flatten: galaxies, not spheres
+        round(radius * math.cos(phi) * 0.16, 3),  # a thin disc: stars lie in the galaxy plane
         round(radius * math.sin(phi) * math.sin(theta), 3),
     ]
 

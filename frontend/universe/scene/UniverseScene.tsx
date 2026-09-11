@@ -9,10 +9,12 @@
 
 import { Canvas } from "@react-three/fiber";
 import { AdaptiveDpr, AdaptiveEvents, Preload } from "@react-three/drei";
+import { Bloom, EffectComposer, Vignette } from "@react-three/postprocessing";
 import { Suspense, useEffect } from "react";
 import { useUniverseStore } from "@/stores/useUniverseStore";
 import { StarField } from "@/universe/entities/StarField";
 import { EntityLabels, SectorGalaxies } from "@/universe/sectors/SectorGalaxies";
+import { Constellations } from "@/universe/sectors/Galaxy";
 import {
   PoliticalRings,
   PortfolioMarkers,
@@ -27,10 +29,10 @@ function SceneContents() {
     <>
       {/* Minimal lighting: a dim ambient plus one key light. Sector cores
           carry their own point lights, which is enough (spec 78). */}
-      <ambientLight intensity={0.7} color="#8fa0c8" />
-      <hemisphereLight args={["#b9c8ea", "#1a2036", 0.35]} />
-      <directionalLight position={[200, 320, 180]} intensity={0.6} color="#dbe8ff" />
-      <fog attach="fog" args={["#05070d", 900, 2600]} />
+      {/* Everything visible is emissive (additive sprites), so lighting is
+          only there for the few lit meshes; the mood comes from bloom. */}
+      <ambientLight intensity={0.25} color="#8fa0c8" />
+      <fog attach="fog" args={["#03040a", 1800, 4800]} />
 
       <BackgroundStars />
       <StarField />
@@ -44,8 +46,19 @@ function SceneContents() {
         <SectorGalaxies />
       </Suspense>
       <Suspense fallback={null}>
+        <Constellations />
+      </Suspense>
+      <Suspense fallback={null}>
         <EntityLabels />
       </Suspense>
+
+      {/* Bloom is what turns points of light into stars. Threshold sits above
+          the dim arm particles so only cores, bright stars and signals bloom. */}
+      <EffectComposer multisampling={0}>
+        <Bloom luminanceThreshold={0.32} luminanceSmoothing={0.35} intensity={1.15}
+               mipmapBlur radius={0.72} />
+        <Vignette eskil={false} offset={0.22} darkness={0.55} />
+      </EffectComposer>
 
       <FlyControls />
       <Preload all />
@@ -70,7 +83,7 @@ export function UniverseScene() {
   return (
     <div className="absolute inset-0">
       <Canvas
-        camera={{ position: [0, 95, 440], fov: 62, near: 0.6, far: 3200 }}
+        camera={{ position: [0, 620, 820], fov: 56, near: 0.6, far: 7000 }}
         gl={{
           antialias: true,
           powerPreference: "high-performance",
@@ -80,7 +93,7 @@ export function UniverseScene() {
         // no visible gain on a scene this soft.
         dpr={[1, 1.75]}
         performance={{ min: 0.5 }}
-        onCreated={({ gl }) => gl.setClearColor("#05070d")}
+        onCreated={({ gl }) => gl.setClearColor("#03040a")}
       >
         <Suspense fallback={null}>
           <SceneContents />

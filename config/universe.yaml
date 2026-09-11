@@ -86,10 +86,10 @@ sectors:
 # --- Visualization layout (spec 45, 49, 60) --------------------------------
 visualization:
   # Sector galaxies are placed on a golden-angle spiral so no two crowd.
-  galaxy_radius: 260.0
-  galaxy_vertical_spread: 70.0
-  subsector_cluster_radius: 34.0
-  stock_cluster_radius: 13.0
+  galaxy_radius: 600.0
+  galaxy_vertical_spread: 30.0
+  subsector_cluster_radius: 50.0
+  stock_cluster_radius: 17.0
   # Market cap -> entity size, logarithmically scaled so mega-caps do not
   # dwarf the universe (spec 49).
   size_log_base: 10.0
