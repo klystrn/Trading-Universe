@@ -1,0 +1,87 @@
+# ---------------------------------------------------------------------------
+# FreshnessService thresholds (spec 24, 28, 29, 30)
+#
+# Trading Universe does not claim every source is live. It claims it will never
+# knowingly trade on data older than the threshold defined for that source.
+#
+# max_age_seconds -> beyond this the value is STALE and blocks dependent trades.
+# warn_age_seconds -> beyond this the value is DEGRADED (visible, not blocking).
+# ---------------------------------------------------------------------------
+
+sources:
+  quote_active_candidate:
+    warn_age_seconds: 3
+    max_age_seconds: 5
+    blocking: true
+  quote_open_position:
+    warn_age_seconds: 3
+    max_age_seconds: 5
+    blocking: true
+  candle_intraday:
+    warn_age_seconds: 45
+    max_age_seconds: 60
+    blocking: true
+  candle_daily:
+    warn_age_seconds: 43200
+    max_age_seconds: 129600      # 36h - tolerates a weekend edge
+    blocking: true
+  market_breadth:
+    warn_age_seconds: 60
+    max_age_seconds: 300
+    blocking: false
+  sector_regime:
+    warn_age_seconds: 180
+    max_age_seconds: 300
+    blocking: false
+  news_discovery:
+    warn_age_seconds: 300
+    max_age_seconds: 900
+    blocking: false
+  news_sentiment_aggregate:
+    warn_age_seconds: 600
+    max_age_seconds: 900
+    blocking: false
+  sec_filing:
+    warn_age_seconds: 120
+    max_age_seconds: 600
+    blocking: false
+  fundamental_ratios:
+    # Fundamentals are filing-driven; "latest filing" is by definition current.
+    warn_age_seconds: 8640000    # 100d
+    max_age_seconds: 15552000    # 180d - a company that has not filed in 6
+                                 # months is a data problem, not a slow quarter
+    blocking: false
+  political_disclosure:
+    warn_age_seconds: 86400
+    max_age_seconds: 604800      # 7d without any disclosure scan = degraded
+    blocking: false
+
+# --- Per-strategy source requirements --------------------------------------
+# A strategy may only produce an executable signal when every source it
+# declares here is within threshold. This is what disables Catalyst Breakout
+# when the news pipeline degrades while leaving Momentum Pullback tradable.
+strategy_requirements:
+  quality_momentum_pullback:
+    required: [quote_active_candidate, candle_daily, fundamental_ratios]
+    preferred: [news_sentiment_aggregate]
+  fundamental_catalyst_breakout:
+    required: [quote_active_candidate, candle_daily, news_sentiment_aggregate, news_discovery]
+    preferred: [sec_filing]
+  quality_oversold_reversal:
+    required: [quote_active_candidate, candle_daily, fundamental_ratios]
+    preferred: [news_sentiment_aggregate]
+  quality_volatility_squeeze:
+    required: [quote_active_candidate, candle_daily]
+    preferred: [news_sentiment_aggregate, fundamental_ratios]
+  value_rerating_50dma_reclaim:
+    required: [quote_active_candidate, candle_daily, fundamental_ratios]
+    preferred: [news_sentiment_aggregate]
+  congress_fresh_purchase:
+    required: [quote_active_candidate, candle_daily, political_disclosure, fundamental_ratios]
+    preferred: [news_sentiment_aggregate]
+  congress_consensus:
+    required: [quote_active_candidate, candle_daily, political_disclosure, fundamental_ratios]
+    preferred: [news_sentiment_aggregate]
+  congress_repeat_buyer:
+    required: [quote_active_candidate, candle_daily, political_disclosure, fundamental_ratios]
+    preferred: [news_sentiment_aggregate]

@@ -1,0 +1,65 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "trading-universe"
+version = "0.1.0"
+description = "Trading Universe - modular swing-trading bot and research platform"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.110",
+    "uvicorn[standard]>=0.27",
+    "pydantic>=2.6",
+    "pydantic-settings>=2.2",
+    "SQLAlchemy>=2.0",
+    "APScheduler>=3.10",
+    "pandas>=2.2",
+    "numpy>=1.26",
+    "PyYAML>=6.0",
+    "httpx>=0.27",
+    "python-dateutil>=2.9",
+    "websockets>=12.0",
+]
+
+[project.optional-dependencies]
+# Local FinBERT sentiment. Heavy (~2.5GB). The lexicon engine is the default so
+# the platform runs without this.
+nlp = [
+    "torch>=2.2",
+    "transformers>=4.40",
+]
+# Moomoo OpenAPI client. Requires OpenD running locally.
+moomoo = [
+    "moomoo-api>=9.0",
+]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.23",
+    "ruff>=0.4",
+    "mypy>=1.9",
+]
+
+[project.scripts]
+trading-universe = "trading_universe.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+filterwarnings = ["ignore::DeprecationWarning"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+ignore = ["B008"]
+
+[tool.mypy]
+python_version = "3.11"
+warn_unused_ignores = true
+ignore_missing_imports = true

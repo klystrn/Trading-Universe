@@ -1,0 +1,111 @@
+# ---------------------------------------------------------------------------
+# Universe configuration (spec 2, 25, 60)
+# ---------------------------------------------------------------------------
+
+# Constituent source. The bundled CSV is a dated seed snapshot; run
+# `python -m trading_universe.data.universe refresh` to update it.
+constituents_file: data/constituents.csv
+indices: [SP500, NDX]
+
+# --- Scan tiering (spec 25) ------------------------------------------------
+# The full universe is NOT subscribed at the highest frequency simultaneously.
+tiers:
+  # Everything: slow periodic scan on daily candles.
+  broad:
+    scan_interval_seconds: 900
+    data: [daily_candles]
+  # Interesting names promoted from the broad scan get real-time quotes.
+  focus:
+    max_symbols: 30
+    scan_interval_seconds: 60
+    data: [daily_candles, intraday_candles, realtime_quote]
+  # Highest-quality candidates get full evaluation every cycle.
+  candidate:
+    max_symbols: 10
+    scan_interval_seconds: 15
+    data: [daily_candles, intraday_candles, realtime_quote, orderbook]
+
+# Watchlisted names are always promoted to at least `focus` tier.
+# They receive scan PRIORITY but never a score bonus (spec 69).
+watchlist_min_tier: focus
+
+# --- Sector taxonomy (GICS-aligned) ----------------------------------------
+# Drives galaxy placement in the 3D universe.
+sectors:
+  - id: information_technology
+    label: Information Technology
+    short: Tech
+    hue: 205
+  - id: health_care
+    label: Health Care
+    short: Health
+    hue: 155
+  - id: financials
+    label: Financials
+    short: Financials
+    hue: 45
+  - id: consumer_discretionary
+    label: Consumer Discretionary
+    short: Cons Disc
+    hue: 285
+  - id: communication_services
+    label: Communication Services
+    short: Comms
+    hue: 320
+  - id: industrials
+    label: Industrials
+    short: Industrials
+    hue: 25
+  - id: consumer_staples
+    label: Consumer Staples
+    short: Staples
+    hue: 100
+  - id: energy
+    label: Energy
+    short: Energy
+    hue: 15
+  - id: utilities
+    label: Utilities
+    short: Utilities
+    hue: 180
+  - id: real_estate
+    label: Real Estate
+    short: Real Estate
+    hue: 260
+  - id: materials
+    label: Materials
+    short: Materials
+    hue: 75
+
+# --- Visualization layout (spec 45, 49, 60) --------------------------------
+visualization:
+  # Sector galaxies are placed on a golden-angle spiral so no two crowd.
+  galaxy_radius: 260.0
+  galaxy_vertical_spread: 70.0
+  subsector_cluster_radius: 34.0
+  stock_cluster_radius: 13.0
+  # Market cap -> entity size, logarithmically scaled so mega-caps do not
+  # dwarf the universe (spec 49).
+  size_log_base: 10.0
+  size_min: 0.35
+  size_max: 2.4
+  # Volume -> orbital velocity, deliberately restrained.
+  orbit_speed_min: 0.02
+  orbit_speed_max: 0.18
+  # Signal confidence -> pulse intensity (spec 50).
+  pulse_bands:
+    subtle: [70, 79]
+    moderate: [80, 89]
+    strong: [90, 100]
+  # Capital flow arcs are a 5% layer only (spec 51).
+  flow:
+    min_rotation_strength: 0.25
+    max_arcs: 12
+    opacity: 0.18
+
+# --- Session calendar ------------------------------------------------------
+sessions:
+  timezone: America/New_York
+  pre_market: ["04:00", "09:30"]
+  regular: ["09:30", "16:00"]
+  after_hours: ["16:00", "20:00"]

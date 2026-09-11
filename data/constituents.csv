@@ -1,0 +1,478 @@
+ticker,name,sector,subsector,indices,market_cap_musd
+AAPL,Apple Inc.,information_technology,Technology Hardware,SP500|NDX,3400000
+MSFT,Microsoft Corporation,information_technology,Software,SP500|NDX,3200000
+NVDA,NVIDIA Corporation,information_technology,Semiconductors,SP500|NDX,3300000
+AVGO,Broadcom Inc.,information_technology,Semiconductors,SP500|NDX,780000
+ORCL,Oracle Corporation,information_technology,Software,SP500,480000
+CRM,Salesforce Inc.,information_technology,Software,SP500,260000
+AMD,Advanced Micro Devices Inc.,information_technology,Semiconductors,SP500|NDX,250000
+ADBE,Adobe Inc.,information_technology,Software,SP500|NDX,200000
+ACN,Accenture plc,information_technology,IT Services,SP500,210000
+CSCO,Cisco Systems Inc.,information_technology,Communications Equipment,SP500|NDX,235000
+QCOM,QUALCOMM Incorporated,information_technology,Semiconductors,SP500|NDX,185000
+TXN,Texas Instruments Incorporated,information_technology,Semiconductors,SP500|NDX,180000
+INTU,Intuit Inc.,information_technology,Software,SP500|NDX,175000
+IBM,International Business Machines,information_technology,IT Services,SP500,200000
+AMAT,Applied Materials Inc.,information_technology,Semiconductor Equipment,SP500|NDX,150000
+NOW,ServiceNow Inc.,information_technology,Software,SP500,190000
+MU,Micron Technology Inc.,information_technology,Semiconductors,SP500|NDX,115000
+LRCX,Lam Research Corporation,information_technology,Semiconductor Equipment,SP500|NDX,100000
+ADI,Analog Devices Inc.,information_technology,Semiconductors,SP500|NDX,110000
+KLAC,KLA Corporation,information_technology,Semiconductor Equipment,SP500|NDX,95000
+PANW,Palo Alto Networks Inc.,information_technology,Software,SP500|NDX,115000
+SNPS,Synopsys Inc.,information_technology,Software,SP500|NDX,80000
+CDNS,Cadence Design Systems Inc.,information_technology,Software,SP500|NDX,75000
+CRWD,CrowdStrike Holdings Inc.,information_technology,Software,SP500|NDX,80000
+INTC,Intel Corporation,information_technology,Semiconductors,SP500|NDX,95000
+ANET,Arista Networks Inc.,information_technology,Communications Equipment,SP500,120000
+ADSK,Autodesk Inc.,information_technology,Software,SP500|NDX,60000
+ROP,Roper Technologies Inc.,information_technology,Software,SP500,55000
+FTNT,Fortinet Inc.,information_technology,Software,SP500|NDX,65000
+NXPI,NXP Semiconductors N.V.,information_technology,Semiconductors,SP500|NDX,55000
+MSI,Motorola Solutions Inc.,information_technology,Communications Equipment,SP500,75000
+APH,Amphenol Corporation,information_technology,Electronic Components,SP500,75000
+TEL,TE Connectivity plc,information_technology,Electronic Components,SP500,45000
+MCHP,Microchip Technology Incorporated,information_technology,Semiconductors,SP500|NDX,35000
+IT,Gartner Inc.,information_technology,IT Services,SP500,38000
+GLW,Corning Incorporated,information_technology,Electronic Components,SP500,38000
+HPQ,HP Inc.,information_technology,Technology Hardware,SP500,32000
+DELL,Dell Technologies Inc.,information_technology,Technology Hardware,SP500,80000
+HPE,Hewlett Packard Enterprise,information_technology,Technology Hardware,SP500,28000
+WDC,Western Digital Corporation,information_technology,Technology Hardware,SP500,22000
+STX,Seagate Technology Holdings,information_technology,Technology Hardware,SP500,20000
+NTAP,NetApp Inc.,information_technology,Technology Hardware,SP500,24000
+ON,ON Semiconductor Corporation,information_technology,Semiconductors,SP500|NDX,28000
+MPWR,Monolithic Power Systems Inc.,information_technology,Semiconductors,SP500,30000
+TER,Teradyne Inc.,information_technology,Semiconductor Equipment,SP500|NDX,18000
+SWKS,Skyworks Solutions Inc.,information_technology,Semiconductors,SP500,14000
+QRVO,Qorvo Inc.,information_technology,Semiconductors,SP500,7000
+ENPH,Enphase Energy Inc.,information_technology,Electrical Equipment,SP500,9000
+FSLR,First Solar Inc.,information_technology,Semiconductors,SP500,22000
+KEYS,Keysight Technologies Inc.,information_technology,Electronic Equipment,SP500,27000
+TDY,Teledyne Technologies Inc.,information_technology,Electronic Equipment,SP500,20000
+ZBRA,Zebra Technologies Corporation,information_technology,Electronic Equipment,SP500,17000
+TRMB,Trimble Inc.,information_technology,Electronic Equipment,SP500,16000
+JBL,Jabil Inc.,information_technology,Electronic Manufacturing,SP500,15000
+FFIV,F5 Inc.,information_technology,Communications Equipment,SP500,14000
+JNPR,Juniper Networks Inc.,information_technology,Communications Equipment,SP500,12000
+AKAM,Akamai Technologies Inc.,information_technology,IT Services,SP500,13000
+EPAM,EPAM Systems Inc.,information_technology,IT Services,SP500,11000
+CDW,CDW Corporation,information_technology,IT Services,SP500,23000
+CTSH,Cognizant Technology Solutions,information_technology,IT Services,SP500,38000
+GEN,Gen Digital Inc.,information_technology,Software,SP500,18000
+PTC,PTC Inc.,information_technology,Software,SP500,21000
+ANSS,ANSYS Inc.,information_technology,Software,SP500,28000
+TYL,Tyler Technologies Inc.,information_technology,Software,SP500,25000
+VRSN,VeriSign Inc.,information_technology,IT Services,SP500,19000
+SMCI,Super Micro Computer Inc.,information_technology,Technology Hardware,SP500,25000
+PLTR,Palantir Technologies Inc.,information_technology,Software,SP500,160000
+ARM,Arm Holdings plc,information_technology,Semiconductors,NDX,140000
+ASML,ASML Holding N.V.,information_technology,Semiconductor Equipment,NDX,340000
+DDOG,Datadog Inc.,information_technology,Software,SP500|NDX,45000
+TEAM,Atlassian Corporation,information_technology,Software,NDX,55000
+WDAY,Workday Inc.,information_technology,Software,SP500|NDX,65000
+ZS,Zscaler Inc.,information_technology,Software,NDX,30000
+MDB,MongoDB Inc.,information_technology,Software,NDX,20000
+HUBS,HubSpot Inc.,information_technology,Software,SP500,30000
+LLY,Eli Lilly and Company,health_care,Pharmaceuticals,SP500,820000
+UNH,UnitedHealth Group Incorporated,health_care,Managed Care,SP500,520000
+JNJ,Johnson & Johnson,health_care,Pharmaceuticals,SP500,380000
+ABBV,AbbVie Inc.,health_care,Biotechnology,SP500,340000
+MRK,Merck & Co. Inc.,health_care,Pharmaceuticals,SP500,250000
+TMO,Thermo Fisher Scientific Inc.,health_care,Life Sciences Tools,SP500,200000
+ABT,Abbott Laboratories,health_care,Medical Devices,SP500,200000
+DHR,Danaher Corporation,health_care,Life Sciences Tools,SP500,180000
+PFE,Pfizer Inc.,health_care,Pharmaceuticals,SP500,150000
+AMGN,Amgen Inc.,health_care,Biotechnology,SP500|NDX,170000
+ISRG,Intuitive Surgical Inc.,health_care,Medical Devices,SP500|NDX,180000
+BSX,Boston Scientific Corporation,health_care,Medical Devices,SP500,130000
+SYK,Stryker Corporation,health_care,Medical Devices,SP500,140000
+VRTX,Vertex Pharmaceuticals Incorporated,health_care,Biotechnology,SP500|NDX,120000
+GILD,Gilead Sciences Inc.,health_care,Biotechnology,SP500|NDX,115000
+MDT,Medtronic plc,health_care,Medical Devices,SP500,115000
+REGN,Regeneron Pharmaceuticals Inc.,health_care,Biotechnology,SP500|NDX,65000
+CI,The Cigna Group,health_care,Managed Care,SP500,80000
+ELV,Elevance Health Inc.,health_care,Managed Care,SP500,80000
+BMY,Bristol-Myers Squibb Company,health_care,Pharmaceuticals,SP500,95000
+MCK,McKesson Corporation,health_care,Health Care Distribution,SP500,80000
+CVS,CVS Health Corporation,health_care,Health Care Services,SP500,75000
+ZTS,Zoetis Inc.,health_care,Pharmaceuticals,SP500,70000
+BDX,Becton Dickinson and Company,health_care,Medical Devices,SP500,55000
+HCA,HCA Healthcare Inc.,health_care,Health Care Facilities,SP500,90000
+COR,Cencora Inc.,health_care,Health Care Distribution,SP500,55000
+EW,Edwards Lifesciences Corporation,health_care,Medical Devices,SP500,44000
+A,Agilent Technologies Inc.,health_care,Life Sciences Tools,SP500,36000
+IQV,IQVIA Holdings Inc.,health_care,Life Sciences Tools,SP500,32000
+IDXX,IDEXX Laboratories Inc.,health_care,Medical Devices,SP500|NDX,38000
+DXCM,DexCom Inc.,health_care,Medical Devices,SP500|NDX,30000
+MTD,Mettler-Toledo International Inc.,health_care,Life Sciences Tools,SP500,26000
+RMD,ResMed Inc.,health_care,Medical Devices,SP500,35000
+CAH,Cardinal Health Inc.,health_care,Health Care Distribution,SP500,28000
+BIIB,Biogen Inc.,health_care,Biotechnology,SP500|NDX,20000
+WST,West Pharmaceutical Services Inc.,health_care,Medical Devices,SP500,22000
+HOLX,Hologic Inc.,health_care,Medical Devices,SP500,17000
+STE,STERIS plc,health_care,Medical Devices,SP500,22000
+ZBH,Zimmer Biomet Holdings Inc.,health_care,Medical Devices,SP500,21000
+BAX,Baxter International Inc.,health_care,Medical Devices,SP500,16000
+MOH,Molina Healthcare Inc.,health_care,Managed Care,SP500,17000
+CNC,Centene Corporation,health_care,Managed Care,SP500,30000
+UHS,Universal Health Services Inc.,health_care,Health Care Facilities,SP500,13000
+DVA,DaVita Inc.,health_care,Health Care Facilities,SP500,12000
+LH,Labcorp Holdings Inc.,health_care,Health Care Services,SP500,19000
+DGX,Quest Diagnostics Incorporated,health_care,Health Care Services,SP500,17000
+CRL,Charles River Laboratories,health_care,Life Sciences Tools,SP500,10000
+TECH,Bio-Techne Corporation,health_care,Life Sciences Tools,SP500,11000
+RVTY,Revvity Inc.,health_care,Life Sciences Tools,SP500,13000
+INCY,Incyte Corporation,health_care,Biotechnology,SP500,14000
+VTRS,Viatris Inc.,health_care,Pharmaceuticals,SP500,13000
+SOLV,Solventum Corporation,health_care,Medical Devices,SP500,12000
+GEHC,GE HealthCare Technologies Inc.,health_care,Medical Devices,SP500|NDX,38000
+ALGN,Align Technology Inc.,health_care,Medical Devices,SP500,15000
+PODD,Insulet Corporation,health_care,Medical Devices,SP500,16000
+AZN,AstraZeneca PLC,health_care,Pharmaceuticals,NDX,240000
+BRK.B,Berkshire Hathaway Inc.,financials,Diversified Financials,SP500,980000
+JPM,JPMorgan Chase & Co.,financials,Banks,SP500,700000
+V,Visa Inc.,financials,Payments,SP500,600000
+MA,Mastercard Incorporated,financials,Payments,SP500,500000
+BAC,Bank of America Corporation,financials,Banks,SP500,340000
+WFC,Wells Fargo & Company,financials,Banks,SP500,250000
+GS,The Goldman Sachs Group Inc.,financials,Capital Markets,SP500,180000
+MS,Morgan Stanley,financials,Capital Markets,SP500,190000
+AXP,American Express Company,financials,Consumer Finance,SP500,200000
+SPGI,S&P Global Inc.,financials,Financial Data,SP500,160000
+BLK,BlackRock Inc.,financials,Asset Management,SP500,150000
+SCHW,The Charles Schwab Corporation,financials,Capital Markets,SP500,140000
+C,Citigroup Inc.,financials,Banks,SP500,130000
+PGR,The Progressive Corporation,financials,Insurance,SP500,150000
+CB,Chubb Limited,financials,Insurance,SP500,115000
+MMC,Marsh & McLennan Companies Inc.,financials,Insurance Brokers,SP500,105000
+ICE,Intercontinental Exchange Inc.,financials,Exchanges,SP500,90000
+CME,CME Group Inc.,financials,Exchanges,SP500|NDX,80000
+MCO,Moody's Corporation,financials,Financial Data,SP500,85000
+USB,U.S. Bancorp,financials,Banks,SP500,75000
+PNC,The PNC Financial Services Group,financials,Banks,SP500,75000
+AON,Aon plc,financials,Insurance Brokers,SP500,75000
+TFC,Truist Financial Corporation,financials,Banks,SP500,58000
+COF,Capital One Financial Corporation,financials,Consumer Finance,SP500,70000
+BK,The Bank of New York Mellon,financials,Capital Markets,SP500,55000
+AJG,Arthur J. Gallagher & Co.,financials,Insurance Brokers,SP500,62000
+AIG,American International Group Inc.,financials,Insurance,SP500,45000
+MET,MetLife Inc.,financials,Insurance,SP500,55000
+PRU,Prudential Financial Inc.,financials,Insurance,SP500,42000
+TRV,The Travelers Companies Inc.,financials,Insurance,SP500,55000
+ALL,The Allstate Corporation,financials,Insurance,SP500,50000
+AFL,Aflac Incorporated,financials,Insurance,SP500,55000
+DFS,Discover Financial Services,financials,Consumer Finance,SP500,42000
+FI,Fiserv Inc.,financials,Payments,SP500,95000
+FIS,Fidelity National Information Services,financials,Payments,SP500,45000
+GPN,Global Payments Inc.,financials,Payments,SP500,25000
+PYPL,PayPal Holdings Inc.,financials,Payments,SP500|NDX,75000
+NDAQ,Nasdaq Inc.,financials,Exchanges,SP500,45000
+STT,State Street Corporation,financials,Capital Markets,SP500,28000
+NTRS,Northern Trust Corporation,financials,Capital Markets,SP500,20000
+FITB,Fifth Third Bancorp,financials,Banks,SP500,28000
+HBAN,Huntington Bancshares Incorporated,financials,Banks,SP500,23000
+RF,Regions Financial Corporation,financials,Banks,SP500,22000
+CFG,Citizens Financial Group Inc.,financials,Banks,SP500,20000
+KEY,KeyCorp,financials,Banks,SP500,18000
+MTB,M&T Bank Corporation,financials,Banks,SP500,32000
+ZION,Zions Bancorporation,financials,Banks,SP500,8000
+CMA,Comerica Incorporated,financials,Banks,SP500,8000
+SYF,Synchrony Financial,financials,Consumer Finance,SP500,25000
+AMP,Ameriprise Financial Inc.,financials,Asset Management,SP500,50000
+TROW,T. Rowe Price Group Inc.,financials,Asset Management,SP500,25000
+BEN,Franklin Resources Inc.,financials,Asset Management,SP500,11000
+IVZ,Invesco Ltd.,financials,Asset Management,SP500,9000
+HIG,The Hartford Insurance Group,financials,Insurance,SP500,35000
+CINF,Cincinnati Financial Corporation,financials,Insurance,SP500,23000
+L,Loews Corporation,financials,Insurance,SP500,19000
+GL,Globe Life Inc.,financials,Insurance,SP500,11000
+BRO,Brown & Brown Inc.,financials,Insurance Brokers,SP500,32000
+WRB,W. R. Berkley Corporation,financials,Insurance,SP500,25000
+EG,Everest Group Ltd.,financials,Insurance,SP500,14000
+ACGL,Arch Capital Group Ltd.,financials,Insurance,SP500,33000
+MSCI,MSCI Inc.,financials,Financial Data,SP500,45000
+FDS,FactSet Research Systems Inc.,financials,Financial Data,SP500,16000
+CBOE,Cboe Global Markets Inc.,financials,Exchanges,SP500,22000
+MKTX,MarketAxess Holdings Inc.,financials,Exchanges,SP500,8000
+JKHY,Jack Henry & Associates Inc.,financials,Payments,SP500,13000
+AMZN,Amazon.com Inc.,consumer_discretionary,Broadline Retail,SP500|NDX,2100000
+TSLA,Tesla Inc.,consumer_discretionary,Automobiles,SP500|NDX,900000
+HD,The Home Depot Inc.,consumer_discretionary,Specialty Retail,SP500,380000
+MCD,McDonald's Corporation,consumer_discretionary,Restaurants,SP500,220000
+BKNG,Booking Holdings Inc.,consumer_discretionary,Travel,SP500|NDX,150000
+LOW,Lowe's Companies Inc.,consumer_discretionary,Specialty Retail,SP500,140000
+TJX,The TJX Companies Inc.,consumer_discretionary,Specialty Retail,SP500,135000
+SBUX,Starbucks Corporation,consumer_discretionary,Restaurants,SP500|NDX,110000
+NKE,NIKE Inc.,consumer_discretionary,Apparel,SP500,110000
+ORLY,O'Reilly Automotive Inc.,consumer_discretionary,Specialty Retail,SP500|NDX,70000
+CMG,Chipotle Mexican Grill Inc.,consumer_discretionary,Restaurants,SP500,75000
+ABNB,Airbnb Inc.,consumer_discretionary,Travel,SP500|NDX,85000
+MAR,Marriott International Inc.,consumer_discretionary,Hotels,SP500|NDX,70000
+HLT,Hilton Worldwide Holdings Inc.,consumer_discretionary,Hotels,SP500,55000
+GM,General Motors Company,consumer_discretionary,Automobiles,SP500,55000
+F,Ford Motor Company,consumer_discretionary,Automobiles,SP500,42000
+AZO,AutoZone Inc.,consumer_discretionary,Specialty Retail,SP500,55000
+ROST,Ross Stores Inc.,consumer_discretionary,Specialty Retail,SP500|NDX,50000
+DHI,D.R. Horton Inc.,consumer_discretionary,Homebuilding,SP500,48000
+LEN,Lennar Corporation,consumer_discretionary,Homebuilding,SP500,40000
+PHM,PulteGroup Inc.,consumer_discretionary,Homebuilding,SP500,23000
+NVR,NVR Inc.,consumer_discretionary,Homebuilding,SP500,24000
+YUM,Yum! Brands Inc.,consumer_discretionary,Restaurants,SP500,38000
+DRI,Darden Restaurants Inc.,consumer_discretionary,Restaurants,SP500,20000
+LVS,Las Vegas Sands Corp.,consumer_discretionary,Casinos,SP500,32000
+WYNN,Wynn Resorts Limited,consumer_discretionary,Casinos,SP500,10000
+MGM,MGM Resorts International,consumer_discretionary,Casinos,SP500,10000
+CZR,Caesars Entertainment Inc.,consumer_discretionary,Casinos,SP500,7000
+RCL,Royal Caribbean Cruises Ltd.,consumer_discretionary,Travel,SP500,60000
+CCL,Carnival Corporation & plc,consumer_discretionary,Travel,SP500,28000
+NCLH,Norwegian Cruise Line Holdings,consumer_discretionary,Travel,SP500,10000
+EXPE,Expedia Group Inc.,consumer_discretionary,Travel,SP500,22000
+DECK,Deckers Outdoor Corporation,consumer_discretionary,Apparel,SP500,18000
+LULU,Lululemon Athletica Inc.,consumer_discretionary,Apparel,SP500|NDX,25000
+RL,Ralph Lauren Corporation,consumer_discretionary,Apparel,SP500,16000
+TPR,Tapestry Inc.,consumer_discretionary,Apparel,SP500,22000
+BBY,Best Buy Co. Inc.,consumer_discretionary,Specialty Retail,SP500,16000
+ULTA,Ulta Beauty Inc.,consumer_discretionary,Specialty Retail,SP500,22000
+TSCO,Tractor Supply Company,consumer_discretionary,Specialty Retail,SP500,28000
+GPC,Genuine Parts Company,consumer_discretionary,Distributors,SP500,17000
+LKQ,LKQ Corporation,consumer_discretionary,Distributors,SP500,8000
+POOL,Pool Corporation,consumer_discretionary,Distributors,SP500,11000
+APTV,Aptiv PLC,consumer_discretionary,Auto Components,SP500,16000
+BWA,BorgWarner Inc.,consumer_discretionary,Auto Components,SP500,8000
+GRMN,Garmin Ltd.,consumer_discretionary,Leisure Products,SP500|NDX,40000
+HAS,Hasbro Inc.,consumer_discretionary,Leisure Products,SP500,10000
+WSM,Williams-Sonoma Inc.,consumer_discretionary,Specialty Retail,SP500,22000
+KMX,CarMax Inc.,consumer_discretionary,Specialty Retail,SP500,8000
+DPZ,Domino's Pizza Inc.,consumer_discretionary,Restaurants,SP500,15000
+MELI,MercadoLibre Inc.,consumer_discretionary,Broadline Retail,NDX,120000
+PDD,PDD Holdings Inc.,consumer_discretionary,Broadline Retail,NDX,150000
+EBAY,eBay Inc.,consumer_discretionary,Broadline Retail,SP500,32000
+DASH,DoorDash Inc.,consumer_discretionary,Consumer Services,SP500|NDX,80000
+GOOGL,Alphabet Inc. Class A,communication_services,Interactive Media,SP500|NDX,2300000
+META,Meta Platforms Inc.,communication_services,Interactive Media,SP500|NDX,1500000
+NFLX,Netflix Inc.,communication_services,Entertainment,SP500|NDX,400000
+DIS,The Walt Disney Company,communication_services,Entertainment,SP500,180000
+TMUS,T-Mobile US Inc.,communication_services,Wireless Telecom,SP500|NDX,240000
+VZ,Verizon Communications Inc.,communication_services,Telecom,SP500,180000
+T,AT&T Inc.,communication_services,Telecom,SP500,165000
+CMCSA,Comcast Corporation,communication_services,Cable & Satellite,SP500|NDX,150000
+CHTR,Charter Communications Inc.,communication_services,Cable & Satellite,SP500|NDX,48000
+EA,Electronic Arts Inc.,communication_services,Entertainment,SP500|NDX,38000
+TTWO,Take-Two Interactive Software,communication_services,Entertainment,SP500|NDX,32000
+WBD,Warner Bros. Discovery Inc.,communication_services,Entertainment,SP500|NDX,25000
+OMC,Omnicom Group Inc.,communication_services,Advertising,SP500,17000
+IPG,The Interpublic Group of Companies,communication_services,Advertising,SP500,10000
+LYV,Live Nation Entertainment Inc.,communication_services,Entertainment,SP500,30000
+MTCH,Match Group Inc.,communication_services,Interactive Media,SP500,9000
+FOXA,Fox Corporation Class A,communication_services,Broadcasting,SP500,22000
+NWSA,News Corporation Class A,communication_services,Publishing,SP500,16000
+PARA,Paramount Skydance Corporation,communication_services,Entertainment,SP500,9000
+GE,GE Aerospace,industrials,Aerospace & Defense,SP500,280000
+CAT,Caterpillar Inc.,industrials,Machinery,SP500,180000
+RTX,RTX Corporation,industrials,Aerospace & Defense,SP500,175000
+UNP,Union Pacific Corporation,industrials,Railroads,SP500,140000
+HON,Honeywell International Inc.,industrials,Industrial Conglomerates,SP500,135000
+BA,The Boeing Company,industrials,Aerospace & Defense,SP500,135000
+ETN,Eaton Corporation plc,industrials,Electrical Equipment,SP500,140000
+DE,Deere & Company,industrials,Machinery,SP500,130000
+LMT,Lockheed Martin Corporation,industrials,Aerospace & Defense,SP500,105000
+UPS,United Parcel Service Inc.,industrials,Air Freight & Logistics,SP500,85000
+ADP,Automatic Data Processing Inc.,industrials,Professional Services,SP500|NDX,120000
+GD,General Dynamics Corporation,industrials,Aerospace & Defense,SP500,80000
+NOC,Northrop Grumman Corporation,industrials,Aerospace & Defense,SP500,72000
+TT,Trane Technologies plc,industrials,Building Products,SP500,85000
+PH,Parker-Hannifin Corporation,industrials,Machinery,SP500,85000
+EMR,Emerson Electric Co.,industrials,Electrical Equipment,SP500,70000
+ITW,Illinois Tool Works Inc.,industrials,Machinery,SP500,75000
+CSX,CSX Corporation,industrials,Railroads,SP500,65000
+NSC,Norfolk Southern Corporation,industrials,Railroads,SP500,60000
+FDX,FedEx Corporation,industrials,Air Freight & Logistics,SP500,55000
+WM,Waste Management Inc.,industrials,Waste Management,SP500,85000
+RSG,Republic Services Inc.,industrials,Waste Management,SP500,70000
+CARR,Carrier Global Corporation,industrials,Building Products,SP500,55000
+JCI,Johnson Controls International,industrials,Building Products,SP500,60000
+CMI,Cummins Inc.,industrials,Machinery,SP500,50000
+PCAR,PACCAR Inc,industrials,Machinery,SP500|NDX,55000
+URI,United Rentals Inc.,industrials,Trading Companies,SP500,50000
+FAST,Fastenal Company,industrials,Trading Companies,SP500|NDX,48000
+GWW,W.W. Grainger Inc.,industrials,Trading Companies,SP500,50000
+LHX,L3Harris Technologies Inc.,industrials,Aerospace & Defense,SP500,45000
+HWM,Howmet Aerospace Inc.,industrials,Aerospace & Defense,SP500,65000
+TDG,TransDigm Group Incorporated,industrials,Aerospace & Defense,SP500,75000
+AXON,Axon Enterprise Inc.,industrials,Aerospace & Defense,SP500|NDX,50000
+PWR,Quanta Services Inc.,industrials,Construction & Engineering,SP500,50000
+AME,AMETEK Inc.,industrials,Electrical Equipment,SP500,42000
+ROK,Rockwell Automation Inc.,industrials,Electrical Equipment,SP500,35000
+DOV,Dover Corporation,industrials,Machinery,SP500,25000
+XYL,Xylem Inc.,industrials,Machinery,SP500,32000
+IR,Ingersoll Rand Inc.,industrials,Machinery,SP500,35000
+OTIS,Otis Worldwide Corporation,industrials,Machinery,SP500,38000
+SWK,Stanley Black & Decker Inc.,industrials,Machinery,SP500,12000
+SNA,Snap-on Incorporated,industrials,Machinery,SP500,17000
+VRSK,Verisk Analytics Inc.,industrials,Professional Services,SP500|NDX,38000
+PAYX,Paychex Inc.,industrials,Professional Services,SP500|NDX,50000
+CTAS,Cintas Corporation,industrials,Commercial Services,SP500|NDX,80000
+BR,Broadridge Financial Solutions,industrials,Professional Services,SP500,27000
+EFX,Equifax Inc.,industrials,Professional Services,SP500,32000
+TRU,TransUnion,industrials,Professional Services,SP500,18000
+LDOS,Leidos Holdings Inc.,industrials,IT Services,SP500,22000
+J,Jacobs Solutions Inc.,industrials,Construction & Engineering,SP500,16000
+MAS,Masco Corporation,industrials,Building Products,SP500,15000
+ALLE,Allegion plc,industrials,Building Products,SP500,12000
+BLDR,Builders FirstSource Inc.,industrials,Building Products,SP500,15000
+NDSN,Nordson Corporation,industrials,Machinery,SP500,12000
+GNRC,Generac Holdings Inc.,industrials,Electrical Equipment,SP500,9000
+HUBB,Hubbell Incorporated,industrials,Electrical Equipment,SP500,22000
+EXPD,Expeditors International,industrials,Air Freight & Logistics,SP500,16000
+CHRW,C.H. Robinson Worldwide Inc.,industrials,Air Freight & Logistics,SP500,12000
+ODFL,Old Dominion Freight Line Inc.,industrials,Trucking,SP500|NDX,35000
+JBHT,J.B. Hunt Transport Services,industrials,Trucking,SP500,14000
+DAL,Delta Air Lines Inc.,industrials,Airlines,SP500,38000
+UAL,United Airlines Holdings Inc.,industrials,Airlines,SP500,30000
+LUV,Southwest Airlines Co.,industrials,Airlines,SP500,18000
+AAL,American Airlines Group Inc.,industrials,Airlines,SP500,8000
+CPRT,Copart Inc.,industrials,Commercial Services,SP500|NDX,45000
+ROL,Rollins Inc.,industrials,Commercial Services,SP500,26000
+PNR,Pentair plc,industrials,Machinery,SP500,17000
+FTV,Fortive Corporation,industrials,Machinery,SP500,18000
+EMN,Eastman Chemical Company,materials,Chemicals,SP500,8000
+WMT,Walmart Inc.,consumer_staples,Consumer Staples Distribution,SP500,780000
+COST,Costco Wholesale Corporation,consumer_staples,Consumer Staples Distribution,SP500|NDX,400000
+PG,The Procter & Gamble Company,consumer_staples,Household Products,SP500,360000
+KO,The Coca-Cola Company,consumer_staples,Beverages,SP500,290000
+PEP,PepsiCo Inc.,consumer_staples,Beverages,SP500|NDX,200000
+PM,Philip Morris International Inc.,consumer_staples,Tobacco,SP500,240000
+MO,Altria Group Inc.,consumer_staples,Tobacco,SP500,95000
+MDLZ,Mondelez International Inc.,consumer_staples,Packaged Foods,SP500|NDX,80000
+CL,Colgate-Palmolive Company,consumer_staples,Household Products,SP500,70000
+TGT,Target Corporation,consumer_staples,Consumer Staples Distribution,SP500,45000
+KMB,Kimberly-Clark Corporation,consumer_staples,Household Products,SP500,42000
+STZ,Constellation Brands Inc.,consumer_staples,Beverages,SP500,30000
+GIS,General Mills Inc.,consumer_staples,Packaged Foods,SP500,30000
+SYY,Sysco Corporation,consumer_staples,Consumer Staples Distribution,SP500,36000
+KDP,Keurig Dr Pepper Inc.,consumer_staples,Beverages,SP500|NDX,45000
+MNST,Monster Beverage Corporation,consumer_staples,Beverages,SP500|NDX,55000
+KR,The Kroger Co.,consumer_staples,Consumer Staples Distribution,SP500,42000
+ADM,Archer-Daniels-Midland Company,consumer_staples,Agricultural Products,SP500,25000
+HSY,The Hershey Company,consumer_staples,Packaged Foods,SP500,35000
+K,Kellanova,consumer_staples,Packaged Foods,SP500,28000
+KHC,The Kraft Heinz Company,consumer_staples,Packaged Foods,SP500,30000
+CHD,Church & Dwight Co. Inc.,consumer_staples,Household Products,SP500,23000
+CLX,The Clorox Company,consumer_staples,Household Products,SP500,15000
+EL,The Estee Lauder Companies Inc.,consumer_staples,Personal Products,SP500,28000
+TSN,Tyson Foods Inc.,consumer_staples,Packaged Foods,SP500,20000
+HRL,Hormel Foods Corporation,consumer_staples,Packaged Foods,SP500,16000
+CAG,Conagra Brands Inc.,consumer_staples,Packaged Foods,SP500,11000
+CPB,The Campbell's Company,consumer_staples,Packaged Foods,SP500,12000
+SJM,The J. M. Smucker Company,consumer_staples,Packaged Foods,SP500,12000
+MKC,McCormick & Company Incorporated,consumer_staples,Packaged Foods,SP500,20000
+DG,Dollar General Corporation,consumer_staples,Consumer Staples Distribution,SP500,18000
+DLTR,Dollar Tree Inc.,consumer_staples,Consumer Staples Distribution,SP500,15000
+BG,Bunge Global SA,consumer_staples,Agricultural Products,SP500,12000
+LW,Lamb Weston Holdings Inc.,consumer_staples,Packaged Foods,SP500,8000
+XOM,Exxon Mobil Corporation,energy,Integrated Oil & Gas,SP500,480000
+CVX,Chevron Corporation,energy,Integrated Oil & Gas,SP500,280000
+COP,ConocoPhillips,energy,Oil & Gas E&P,SP500,120000
+EOG,EOG Resources Inc.,energy,Oil & Gas E&P,SP500,68000
+SLB,Schlumberger Limited,energy,Oil & Gas Services,SP500,55000
+MPC,Marathon Petroleum Corporation,energy,Refining,SP500,52000
+PSX,Phillips 66,energy,Refining,SP500,52000
+WMB,The Williams Companies Inc.,energy,Midstream,SP500,70000
+OKE,ONEOK Inc.,energy,Midstream,SP500,50000
+KMI,Kinder Morgan Inc.,energy,Midstream,SP500,60000
+VLO,Valero Energy Corporation,energy,Refining,SP500,42000
+HES,Hess Corporation,energy,Oil & Gas E&P,SP500,44000
+OXY,Occidental Petroleum Corporation,energy,Oil & Gas E&P,SP500,45000
+DVN,Devon Energy Corporation,energy,Oil & Gas E&P,SP500,22000
+FANG,Diamondback Energy Inc.,energy,Oil & Gas E&P,SP500,42000
+HAL,Halliburton Company,energy,Oil & Gas Services,SP500,22000
+BKR,Baker Hughes Company,energy,Oil & Gas Services,SP500|NDX,42000
+CTRA,Coterra Energy Inc.,energy,Oil & Gas E&P,SP500,19000
+EQT,EQT Corporation,energy,Oil & Gas E&P,SP500,28000
+APA,APA Corporation,energy,Oil & Gas E&P,SP500,8000
+TRGP,Targa Resources Corp.,energy,Midstream,SP500,38000
+NEE,NextEra Energy Inc.,utilities,Electric Utilities,SP500,165000
+SO,The Southern Company,utilities,Electric Utilities,SP500,98000
+DUK,Duke Energy Corporation,utilities,Electric Utilities,SP500,92000
+CEG,Constellation Energy Corporation,utilities,Independent Power,SP500|NDX,75000
+AEP,American Electric Power Company,utilities,Electric Utilities,SP500,55000
+SRE,Sempra,utilities,Multi-Utilities,SP500,55000
+D,Dominion Energy Inc.,utilities,Multi-Utilities,SP500,48000
+EXC,Exelon Corporation,utilities,Electric Utilities,SP500,45000
+XEL,Xcel Energy Inc.,utilities,Multi-Utilities,SP500|NDX,40000
+PEG,Public Service Enterprise Group,utilities,Multi-Utilities,SP500,42000
+ED,Consolidated Edison Inc.,utilities,Multi-Utilities,SP500,36000
+WEC,WEC Energy Group Inc.,utilities,Multi-Utilities,SP500,32000
+ES,Eversource Energy,utilities,Electric Utilities,SP500,22000
+AEE,Ameren Corporation,utilities,Multi-Utilities,SP500,25000
+DTE,DTE Energy Company,utilities,Multi-Utilities,SP500,27000
+PPL,PPL Corporation,utilities,Electric Utilities,SP500,26000
+FE,FirstEnergy Corp.,utilities,Electric Utilities,SP500,23000
+CMS,CMS Energy Corporation,utilities,Multi-Utilities,SP500,21000
+CNP,CenterPoint Energy Inc.,utilities,Multi-Utilities,SP500,23000
+ATO,Atmos Energy Corporation,utilities,Gas Utilities,SP500,23000
+NI,NiSource Inc.,utilities,Multi-Utilities,SP500,19000
+LNT,Alliant Energy Corporation,utilities,Electric Utilities,SP500,16000
+EVRG,Evergy Inc.,utilities,Electric Utilities,SP500,16000
+AES,The AES Corporation,utilities,Independent Power,SP500,9000
+NRG,NRG Energy Inc.,utilities,Independent Power,SP500,20000
+PCG,PG&E Corporation,utilities,Electric Utilities,SP500,35000
+VST,Vistra Corp.,utilities,Independent Power,SP500,45000
+AWK,American Water Works Company,utilities,Water Utilities,SP500,26000
+PLD,Prologis Inc.,real_estate,Industrial REITs,SP500,105000
+AMT,American Tower Corporation,real_estate,Telecom REITs,SP500,90000
+EQIX,Equinix Inc.,real_estate,Data Center REITs,SP500|NDX,80000
+WELL,Welltower Inc.,real_estate,Health Care REITs,SP500,90000
+SPG,Simon Property Group Inc.,real_estate,Retail REITs,SP500,60000
+DLR,Digital Realty Trust Inc.,real_estate,Data Center REITs,SP500,55000
+O,Realty Income Corporation,real_estate,Retail REITs,SP500,50000
+PSA,Public Storage,real_estate,Self-Storage REITs,SP500,52000
+CCI,Crown Castle Inc.,real_estate,Telecom REITs,SP500,42000
+CBRE,CBRE Group Inc.,real_estate,Real Estate Services,SP500,42000
+EXR,Extra Space Storage Inc.,real_estate,Self-Storage REITs,SP500,32000
+AVB,AvalonBay Communities Inc.,real_estate,Residential REITs,SP500,28000
+EQR,Equity Residential,real_estate,Residential REITs,SP500,26000
+VTR,Ventas Inc.,real_estate,Health Care REITs,SP500,28000
+INVH,Invitation Homes Inc.,real_estate,Residential REITs,SP500,19000
+MAA,Mid-America Apartment Communities,real_estate,Residential REITs,SP500,17000
+ESS,Essex Property Trust Inc.,real_estate,Residential REITs,SP500,18000
+UDR,UDR Inc.,real_estate,Residential REITs,SP500,14000
+ARE,Alexandria Real Estate Equities,real_estate,Office REITs,SP500,13000
+BXP,BXP Inc.,real_estate,Office REITs,SP500,11000
+KIM,Kimco Realty Corporation,real_estate,Retail REITs,SP500,14000
+REG,Regency Centers Corporation,real_estate,Retail REITs,SP500,13000
+FRT,Federal Realty Investment Trust,real_estate,Retail REITs,SP500,8000
+HST,Host Hotels & Resorts Inc.,real_estate,Hotel REITs,SP500,11000
+IRM,Iron Mountain Incorporated,real_estate,Specialized REITs,SP500,28000
+WY,Weyerhaeuser Company,real_estate,Timber REITs,SP500,20000
+DOC,Healthpeak Properties Inc.,real_estate,Health Care REITs,SP500,13000
+CSGP,CoStar Group Inc.,real_estate,Real Estate Services,SP500|NDX,32000
+LIN,Linde plc,materials,Industrial Gases,SP500,215000
+SHW,The Sherwin-Williams Company,materials,Specialty Chemicals,SP500,85000
+APD,Air Products and Chemicals Inc.,materials,Industrial Gases,SP500,65000
+ECL,Ecolab Inc.,materials,Specialty Chemicals,SP500,68000
+FCX,Freeport-McMoRan Inc.,materials,Copper,SP500,60000
+NEM,Newmont Corporation,materials,Gold,SP500,65000
+NUE,Nucor Corporation,materials,Steel,SP500,32000
+DOW,Dow Inc.,materials,Commodity Chemicals,SP500,20000
+DD,DuPont de Nemours Inc.,materials,Specialty Chemicals,SP500,32000
+PPG,PPG Industries Inc.,materials,Specialty Chemicals,SP500,26000
+LYB,LyondellBasell Industries N.V.,materials,Commodity Chemicals,SP500,22000
+VMC,Vulcan Materials Company,materials,Construction Materials,SP500,36000
+MLM,Martin Marietta Materials Inc.,materials,Construction Materials,SP500,34000
+IFF,International Flavors & Fragrances,materials,Specialty Chemicals,SP500,20000
+ALB,Albemarle Corporation,materials,Specialty Chemicals,SP500,10000
+CE,Celanese Corporation,materials,Specialty Chemicals,SP500,7000
+MOS,The Mosaic Company,materials,Fertilizers,SP500,9000
+CF,CF Industries Holdings Inc.,materials,Fertilizers,SP500,14000
+STLD,Steel Dynamics Inc.,materials,Steel,SP500,20000
+PKG,Packaging Corporation of America,materials,Containers & Packaging,SP500,20000
+IP,International Paper Company,materials,Containers & Packaging,SP500,26000
+AMCR,Amcor plc,materials,Containers & Packaging,SP500,14000
+BALL,Ball Corporation,materials,Containers & Packaging,SP500,16000
+AVY,Avery Dennison Corporation,materials,Containers & Packaging,SP500,14000
+SW,Smurfit WestRock plc,materials,Containers & Packaging,SP500,24000
+GOOG,Alphabet Inc. Class C,communication_services,Interactive Media,SP500|NDX,2300000
+FOX,Fox Corporation Class B,communication_services,Broadcasting,SP500,22000
+NWS,News Corporation Class B,communication_services,Publishing,SP500,16000
