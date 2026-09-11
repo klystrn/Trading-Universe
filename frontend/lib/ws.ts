@@ -23,6 +23,10 @@ function resolveWsUrl(): string {
   if (process.env.NEXT_PUBLIC_WS_URL) return process.env.NEXT_PUBLIC_WS_URL;
   if (typeof window === "undefined") return "ws://127.0.0.1:8000/ws";
   const secure = window.location.protocol === "https:";
+  // Served by the backend itself (static export): the socket is same-origin.
+  if (process.env.NEXT_PUBLIC_WS_SAME_ORIGIN === "1") {
+    return `${secure ? "wss" : "ws"}://${window.location.host}/ws`;
+  }
   return `${secure ? "wss" : "ws"}://${window.location.hostname}:8000/ws`;
 }
 

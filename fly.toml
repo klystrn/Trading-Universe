@@ -1,0 +1,33 @@
+# Fly.io: `fly launch --copy-config --yes` then `fly deploy`.
+app = "trading-universe-demo"
+primary_region = "iad"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  TU_DATA_MODE = "DEMO"
+  TRADING_ENV = "PAPER"
+  ALLOW_REAL_ORDERS = "false"
+  TU_OPERATING_MODE = "ADVISORY"
+  TU_READ_ONLY = "true"
+  TU_CORS_ORIGINS = "*"
+
+[http_service]
+  internal_port = 8000
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+
+  [[http_service.checks]]
+    interval = "30s"
+    timeout = "5s"
+    grace_period = "40s"
+    method = "GET"
+    path = "/api/system/status"
+
+[[vm]]
+  memory = "512mb"
+  cpu_kind = "shared"
+  cpus = 1

@@ -51,6 +51,8 @@ export function ParametersPanel() {
     useTradingStore.setState({ health: await api.health() });
   };
 
+  const readOnly = health?.read_only ?? false;
+
   const isOverridden =
     activeStrategy !== null &&
     recommendation !== null &&
@@ -100,7 +102,7 @@ export function ParametersPanel() {
 
               <button
                 onClick={() => void accept()}
-                disabled={activeStrategy === recommendation.primary_strategy}
+                disabled={readOnly || activeStrategy === recommendation.primary_strategy}
                 className={cn(
                   "mt-4 w-full rounded-lg border py-2 font-mono text-[10px] uppercase tracking-[0.18em] transition-colors",
                   activeStrategy === recommendation.primary_strategy
@@ -129,7 +131,8 @@ export function ParametersPanel() {
           <select
             value={activeStrategy ?? "NO_TRADE"}
             onChange={(e) => void override(e.target.value)}
-            className="mt-2 w-full rounded-lg border border-glass-edge bg-void-200/70 px-3 py-2 text-sm text-ink outline-none focus:border-accent/50"
+            disabled={readOnly}
+            className="mt-2 w-full disabled:opacity-50 rounded-lg border border-glass-edge bg-void-200/70 px-3 py-2 text-sm text-ink outline-none focus:border-accent/50"
           >
             <option value="NO_TRADE">NO TRADE — nothing executes</option>
             {strategies.map((strategy) => (
@@ -159,7 +162,9 @@ export function ParametersPanel() {
                 <button
                   key={mode}
                   onClick={() => void setMode(mode)}
+                  disabled={readOnly}
                   className={cn(
+                    "disabled:opacity-50",
                     "rounded-lg border px-2 py-2 font-mono text-[9px] uppercase tracking-[0.1em] transition-colors",
                     active
                       ? live
@@ -185,7 +190,7 @@ export function ParametersPanel() {
 
         {/* --- risk sliders ----------------------------------------------------- */}
         {risk && (
-          <section className="space-y-4">
+          <section className={cn("space-y-4", readOnly && "pointer-events-none opacity-60")}>
             <p className="font-mono text-[9px] uppercase tracking-[0.18em] text-ink-faint">
               Risk limits
             </p>

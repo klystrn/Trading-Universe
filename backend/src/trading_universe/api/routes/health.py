@@ -41,6 +41,7 @@ def status(platform: Platform = Depends(platform_dep)) -> dict:
         "kill_switch": snapshot.kill_switch_engaged,
         "trading_env": snapshot.trading_env,
         "allow_real_orders": snapshot.allow_real_orders,
+        "read_only": snapshot.read_only,
         "session": snapshot.session,
         "open_orders": snapshot.open_orders,
         "rejected_orders_today": snapshot.rejected_orders_today,

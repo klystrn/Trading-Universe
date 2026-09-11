@@ -37,6 +37,7 @@ class HealthService:
             operating_mode=self.platform.execution.operating_mode.value,
             trading_env=settings.trading_env,
             allow_real_orders=settings.allow_real_orders,
+            read_only=settings.read_only,
             database_healthy=self._database_healthy(),
             scanner_running=self.platform.scheduler_running,
             open_orders=len(self.platform.broker.get_open_orders()),

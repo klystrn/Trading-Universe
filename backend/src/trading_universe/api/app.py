@@ -5,8 +5,10 @@ from __future__ import annotations
 import logging
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 
 from trading_universe.api.routes import (
     analytics,
@@ -102,13 +104,39 @@ def create_app() -> FastAPI:
     ):
         app.include_router(router)
 
-    @app.get("/", tags=["meta"])
-    def root() -> dict[str, str]:
-        return {
-            "name": "Trading Universe",
-            "version": "0.1.0",
-            "docs": "/docs",
-        }
+    if settings.read_only:
+        logger.warning("TU_READ_ONLY=true: all mutating API calls will be refused")
+
+        @app.middleware("http")
+        async def _read_only_guard(request: Request, call_next):
+            if request.method in ("POST", "PUT", "PATCH", "DELETE") and (
+                request.url.path.startswith("/api/")
+            ):
+                return JSONResponse(
+                    status_code=403,
+                    content={
+                        "detail": "This is a shared read-only demo; settings, modes and "
+                        "orders cannot be changed here. Run it locally to trade."
+                    },
+                )
+            return await call_next(request)
+
+    static_dir = settings.resolved_static_dir
+    if static_dir is not None:
+        # Mounted last so /api, /ws and /docs keep precedence. html=True serves
+        # index.html for "/", which is the entire single-page frontend.
+        logger.info("serving frontend from %s", static_dir)
+        app.mount("/", StaticFiles(directory=str(static_dir), html=True), name="frontend")
+    else:
+        @app.get("/", tags=["meta"])
+        def root() -> dict[str, str]:
+            return {
+                "name": "Trading Universe",
+                "version": "0.1.0",
+                "docs": "/docs",
+                "frontend": "not bundled - run `npm run dev` in frontend/, or build a "
+                "static export (see README: Shareable demo)",
+            }
 
     return app
 

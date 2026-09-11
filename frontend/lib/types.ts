@@ -222,6 +222,7 @@ export interface SystemHealth {
   operating_mode: OperatingMode;
   trading_env: "PAPER" | "REAL";
   allow_real_orders: boolean;
+  read_only: boolean;
   database_healthy: boolean;
   scanner_running: boolean;
   open_orders: number;

@@ -73,6 +73,31 @@ trading-universe briefing      # today's briefing as JSON
 trading-universe import-disclosures path/to/house_ptr_export.csv --chamber house
 ```
 
+## Shareable demo (one container)
+
+`Dockerfile` builds the frontend as a static export and has the API serve it,
+so one container is the whole deployment: the universe at `/`, the API at
+`/api`, the WebSocket at `/ws`, docs at `/docs`. It runs on DEMO data with
+`TU_READ_ONLY=true`, so visitors can fly, search, ask questions and read every
+panel but cannot change modes, risk limits, or the kill switch.
+
+Pick a host:
+
+- **Render (free, no card):** New → Blueprint → select this repo. `render.yaml`
+  does the rest and you get an `https://…onrender.com` URL. Free instances
+  sleep when idle and take ~40s to wake.
+- **Fly.io:** `fly launch --copy-config --yes && fly deploy` (uses `fly.toml`).
+- **Anywhere that runs a container:** every push to `main` publishes
+  `ghcr.io/klystrn/trading-universe:latest` via GitHub Actions, so
+  `docker run -p 8000:8000 -e TU_READ_ONLY=true ghcr.io/klystrn/trading-universe`
+  is a complete demo. Locally, `docker build -t trading-universe . && docker run -p 8000:8000 trading-universe`
+  then open http://localhost:8000.
+
+Drop `TU_READ_ONLY` for a private instance where you want the controls live.
+Real orders remain impossible in any of these: they need `TRADING_ENV=REAL`,
+`ALLOW_REAL_ORDERS=true`, Moomoo credentials, and OpenD reachable from the
+container, none of which a demo deployment has.
+
 ## Operating modes and the safety model
 
 | Mode | What happens |

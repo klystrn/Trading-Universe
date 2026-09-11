@@ -1,0 +1,25 @@
+# Render Blueprint: https://render.com/docs/blueprint-spec
+# Click "New > Blueprint" in Render, point it at this repo, and it builds the
+# Dockerfile and gives you a public https URL. The free tier sleeps after
+# inactivity and wakes on the next request (~40s cold start while the demo
+# market is generated).
+services:
+  - type: web
+    name: trading-universe-demo
+    runtime: docker
+    plan: free
+    healthCheckPath: /api/system/status
+    envVars:
+      - key: TU_DATA_MODE
+        value: DEMO
+      - key: TRADING_ENV
+        value: PAPER
+      - key: ALLOW_REAL_ORDERS
+        value: "false"
+      - key: TU_OPERATING_MODE
+        value: ADVISORY
+      # Visitors can explore; they cannot change modes, limits or orders.
+      - key: TU_READ_ONLY
+        value: "true"
+      - key: TU_CORS_ORIGINS
+        value: "*"

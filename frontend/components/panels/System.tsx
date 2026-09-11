@@ -50,6 +50,7 @@ export function SystemPanel() {
   };
 
   const overallHealthy = health.overall === "LIVE" || health.overall === "HEALTHY";
+  const readOnly = health.read_only;
 
   return (
     <div className="flex h-full flex-col">
@@ -61,9 +62,15 @@ export function SystemPanel() {
 
       <div className="min-h-0 flex-1 space-y-6 overflow-y-auto px-5 py-5">
         {/* --- the kill switch: always visible, always obvious --------------- */}
+        {readOnly && (
+          <p className="rounded-lg border border-warn/40 bg-warn/10 px-3 py-2 text-[11px] leading-relaxed text-warn">
+            Shared read-only demo: controls are disabled here. Run the platform
+            locally to change modes, limits or execution.
+          </p>
+        )}
         <button
           onClick={() => void toggleKill()}
-          disabled={busy}
+          disabled={busy || readOnly}
           className={cn(
             "w-full rounded-xl border-2 py-4 font-mono text-sm uppercase tracking-[0.24em] transition-all duration-200 ease-calm",
             health.kill_switch_engaged
@@ -94,7 +101,7 @@ export function SystemPanel() {
         <div className="flex gap-1.5">
           <button
             onClick={() => void scan()}
-            disabled={busy}
+            disabled={busy || readOnly}
             className="flex-1 rounded-lg border border-glass-edge py-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-ink-dim hover:text-accent disabled:opacity-50"
           >
             {busy ? "Working…" : "Scan now"}

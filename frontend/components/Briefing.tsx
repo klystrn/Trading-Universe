@@ -50,6 +50,14 @@ export function BriefingStrip() {
         </div>
       )}
       <div className="ml-auto flex items-center gap-3">
+        {health?.read_only && (
+          <span
+            className="rounded-md border border-warn/40 bg-warn/10 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-[0.12em] text-warn"
+            title="Shared demo: settings, modes and orders cannot be changed here"
+          >
+            Read-only demo
+          </span>
+        )}
         <span className={cn("font-mono text-[9px] uppercase tracking-[0.16em]",
           canExecute ? "text-live" : "text-ink-faint")}>
           {health?.kill_switch_engaged ? "STOPPED"

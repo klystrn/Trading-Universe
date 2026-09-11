@@ -74,6 +74,15 @@ class Settings(BaseSettings):
     # --- Paper broker seed ---------------------------------------------------
     paper_starting_cash: float = Field(default=10000.0, alias="TU_PAPER_STARTING_CASH")
 
+    # --- Shared demo -----------------------------------------------------------
+    # Rejects every mutating API call so a public demo cannot have its modes,
+    # risk limits or kill switch changed by visitors. Real-order gating is
+    # independent of this and stays in force regardless.
+    read_only: bool = Field(default=False, alias="TU_READ_ONLY")
+    # Directory holding a static export of the frontend; when present the API
+    # serves it at "/", so one process is the whole deployment.
+    static_dir: str = Field(default="", alias="TU_STATIC_DIR")
+
     @field_validator("trading_env")
     @classmethod
     def _normalise_env(cls, v: str) -> str:
@@ -113,6 +122,11 @@ class Settings(BaseSettings):
             return self.database_url
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
         return f"sqlite:///{self.db_path}"
+
+    @property
+    def resolved_static_dir(self) -> Path | None:
+        candidate = Path(self.static_dir) if self.static_dir else REPO_ROOT / "frontend" / "out"
+        return candidate if (candidate / "index.html").exists() else None
 
     @property
     def cors_origin_list(self) -> list[str]:

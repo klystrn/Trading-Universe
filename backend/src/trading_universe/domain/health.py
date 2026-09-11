@@ -58,6 +58,7 @@ class SystemHealth(BaseModel):
     operating_mode: str = "ADVISORY"
     trading_env: str = "PAPER"
     allow_real_orders: bool = False
+    read_only: bool = False
     database_healthy: bool = True
     scanner_running: bool = False
     open_orders: int = 0
