@@ -1,68 +1,33 @@
-# ---------------------------------------------------------------------------
-# Risk engine configuration (spec 3, 18, 19, 20)
-#
-# The risk engine is deliberately independent of strategy logic. A strategy can
-# only ever produce a Signal; whether that Signal may become an Order is decided
-# here and nowhere else.
-# ---------------------------------------------------------------------------
-
-# --- Core limits -----------------------------------------------------------
 minimum_reward_risk: 1.75
-max_position_value: 150.0        # USD of capital deployed, NOT max loss
+max_position_value: 150
 max_new_trades_per_day: 3
 max_open_positions: 5
 allow_fractional_shares: true
 long_only: true
-
-# --- Universe-level guards -------------------------------------------------
-# no second position in a ticker already held
 allow_duplicate_ticker: false
-# no adding to a losing position
 allow_averaging_down: false
-
-# --- Liquidity -------------------------------------------------------------
 liquidity:
-  min_avg_dollar_volume_20d: 20000000.0   # USD
+  min_avg_dollar_volume_20d: 20000000.0
   min_avg_share_volume_20d: 500000
-  max_spread_pct: 0.005                   # 0.5% of mid
+  max_spread_pct: 0.005
   min_price: 5.0
-
-# --- Freshness gating ------------------------------------------------------
-# The risk engine refuses to act on data it knows to be stale. Per-source
-# thresholds live in freshness.yaml; this switches the enforcement on.
 require_fresh_market_data: true
 require_required_sources_available: true
-
-# --- Session permissions (spec 61) -----------------------------------------
 sessions:
-  # Automatic execution is restricted to the regular session for V1.
-  allow_auto_execution_in: [REGULAR]
-  # Advisory signals may still be generated outside it.
-  allow_signal_generation_in: [PRE_MARKET, REGULAR, AFTER_HOURS]
-
-# --- Loss-streak guard (spec 18) -------------------------------------------
-# Explicitly configurable rather than hard-coded.
+  allow_auto_execution_in:
+  - REGULAR
+  allow_signal_generation_in:
+  - PRE_MARKET
+  - REGULAR
+  - AFTER_HOURS
 loss_streak_guard:
   enabled: true
   consecutive_losses: 2
   action: PAUSE_NEW_ENTRIES_FOR_SESSION
-
-# --- Score thresholds ------------------------------------------------------
-# Per-strategy minimums override these; see strategies.yaml.
 min_score_standard: 70
 min_score_political: 75
-
-# --- Kill switch -----------------------------------------------------------
-# Runtime-togglable from the System tab. Persisted so a restart does not
-# silently re-enable trading.
 kill_switch_engaged: false
-
-# --- Order hygiene ---------------------------------------------------------
 orders:
-  # Reject a second order for the same ticker+strategy within this window.
   duplicate_window_seconds: 300
-  # Refuse to size a position below this notional (avoids dust fills).
   min_notional: 5.0
-  # Maximum tolerated slippage between signal entry and current price before
-  # the order is abandoned as "no longer the trade we analysed".
   max_entry_drift_pct: 0.01

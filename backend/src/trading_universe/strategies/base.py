@@ -12,6 +12,7 @@ Two rules define this layer:
 
 from __future__ import annotations
 
+import math
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -205,15 +206,18 @@ class Strategy(ABC):
 
         risk = entry - stop
         min_rr = self.minimum_reward_risk
-        minimum = entry + risk * min_rr
-        notes: dict[str, Any] = {"minimum_target": round(minimum, 4), "minimum_rr": min_rr}
+        # Round the target UP to 4dp: rounding to nearest can shave the ratio
+        # to 1.7499 and the risk engine would then correctly reject our own
+        # target for missing the 1.75 minimum.
+        minimum = math.ceil((entry + risk * min_rr) * 10_000) / 10_000
+        notes: dict[str, Any] = {"minimum_target": minimum, "minimum_rr": min_rr}
 
         rungs = get_config().strategies.get("targets.extension_rungs", []) or []
         chosen = minimum
         chosen_rr = min_rr
         if resistance and resistance > minimum:
             for rung in sorted(float(r) for r in rungs):
-                candidate = entry + risk * rung
+                candidate = math.ceil((entry + risk * rung) * 10_000) / 10_000
                 if candidate <= resistance:
                     chosen, chosen_rr = candidate, rung
             notes["resistance"] = round(resistance, 4)
@@ -224,7 +228,7 @@ class Strategy(ABC):
             notes["resistance_below_minimum_target"] = True
 
         notes["selected_rr"] = chosen_rr
-        return round(chosen, 4), notes
+        return chosen, notes
 
     def resistance_for(self, ctx: StrategyContext) -> float | None:
         """Nearest overhead supply: prior swing high, 20-day high or upper band."""
@@ -370,7 +374,9 @@ class Strategy(ABC):
             return 0.8
         return 0.35
 
-    def _fail(self, ctx: StrategyContext, failed: list[str], passed: list[str]) -> StrategyEvaluation:
+    def _fail(
+        self, ctx: StrategyContext, failed: list[str], passed: list[str]
+    ) -> StrategyEvaluation:
         return StrategyEvaluation(
             strategy_id=self.id,
             ticker=ctx.ticker,

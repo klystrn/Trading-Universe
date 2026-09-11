@@ -121,7 +121,8 @@ class PaperBroker(BrokerBase):
                 return order
 
             # Simulated slippage: buys fill slightly worse than the limit.
-            fill = price * (1.0 + self._slippage if order.side is OrderSide.BUY else 1.0 - self._slippage)
+            drift = 1.0 + self._slippage if order.side is OrderSide.BUY else 1.0 - self._slippage
+            fill = price * drift
             fill = round(fill, 4)
             cost = fill * order.quantity
 

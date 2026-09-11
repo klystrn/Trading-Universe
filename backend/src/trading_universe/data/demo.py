@@ -169,7 +169,6 @@ class DemoMarket:
 
         for i in range(n):
             from_end = n - 1 - i          # 0 on the most recent bar
-            tail = max(0.0, (i - (n - 45)) / 45.0)
             d, v = daily_drift, daily_vol
             vol_mult = 1.0
 
@@ -194,10 +193,13 @@ class DemoMarket:
             elif archetype == "oversold_washout":
                 if from_end > 20:
                     d, v = 0.0008, daily_vol
-                elif from_end > 2:
+                elif from_end > 1:
                     d, v, vol_mult = -0.0135, calm, 1.6     # sustained selling
                 else:
-                    d, v, vol_mult = 0.0090, quiet, 1.35    # selling exhausts
+                    # Selling exhausts, but only just: the setup has to still be
+                    # AT support, not three days above it. Volume expands on the
+                    # turn, which is the evidence S3 actually requires.
+                    d, v, vol_mult = 0.0080, quiet, 3.0
             elif archetype == "volatility_squeeze":
                 # The compression must be SHORTER than the percentile lookback
                 # (63 bars), or the quiet bars become their own baseline and the
@@ -231,6 +233,7 @@ class DemoMarket:
 
         out: list[Candle] = []
         prev_close = closes[0]
+        last_index = len(days) - 1
         for i, (day, close) in enumerate(zip(days, closes, strict=True)):
             rr = _rng("bar", ticker, day.isoformat())
             bar_vol = min(daily_vol, 0.02) if archetype != "plain_drift" else daily_vol
@@ -238,6 +241,16 @@ class DemoMarket:
             open_ = prev_close * (1.0 + rr.gauss(0.0, bar_vol * 0.30))
             high = max(open_, close) * (1.0 + intraday * rr.uniform(0.25, 1.0))
             low = min(open_, close) * (1.0 - intraday * rr.uniform(0.25, 1.0))
+            if archetype == "oversold_washout" and i == last_index and out:
+                # Bullish engulfing: opens below the prior close and closes above
+                # the prior open. This is the "buyers returned" evidence, and
+                # without it S3 is correct to stand aside.
+                prior = out[-1]
+                open_ = min(open_, prior.close * 0.995)
+                close = max(close, prior.open * 1.004)
+                high = max(high, close * 1.004)
+                low = min(low, open_ * 0.997)
+
             out.append(
                 Candle(
                     ticker=ticker,
@@ -299,12 +312,19 @@ class DemoMarket:
         archetype = archetype_for(ticker)
         r = _rng("news", ticker, now.date().isoformat())
         count = r.randint(0, 6)
-        if archetype == "catalyst_breakout":
+        # Setup archetypes need coverage inside the 24h window, otherwise the
+        # sentiment aggregate is empty and every sentiment gate reads 0.00.
+        if archetype in ("catalyst_breakout", "value_reclaim", "uptrend_pullback",
+                         "oversold_washout"):
             count = max(count, 4)
 
         articles: list[NewsArticle] = []
         for i in range(count):
-            age_hours = r.uniform(0.5, days * 24)
+            if i == 0 and archetype in ("catalyst_breakout", "value_reclaim",
+                                        "uptrend_pullback", "oversold_washout"):
+                age_hours = r.uniform(1.0, 10.0)
+            else:
+                age_hours = r.uniform(0.5, days * 24)
             published = now - timedelta(hours=age_hours)
             # Archetype biases which headline pool is drawn from.
             if archetype in ("catalyst_breakout", "uptrend_pullback"):
@@ -329,6 +349,10 @@ class DemoMarket:
             recency = 1.0 - min(1.0, age_hours / (days * 24))
             if archetype == "oversold_washout" and base < 0:
                 base *= 1.0 - 0.7 * recency
+            elif archetype == "value_reclaim":
+                # The re-rating thesis IS improving perception: older coverage
+                # sour, recent coverage turning constructive.
+                base = -0.40 + 0.95 * recency
 
             sentiment = max(-1.0, min(1.0, base + r.gauss(0.0, 0.12)))
             catalyst = None
@@ -449,6 +473,13 @@ class DemoMarket:
         pool = sorted(tickers)
         if not pool:
             return []
+        # Politicians disclose across the whole market, but the strategies only
+        # fire where technical confirmation exists too. Seeding the headline
+        # cases onto confirming names is what makes P1-P3 reachable in DEMO.
+        breaking_out = [t for t in pool if archetype_for(t) == "catalyst_breakout"]
+        confirming = breaking_out or [
+            t for t in pool if archetype_for(t) == "uptrend_pullback"
+        ] or pool
 
         out: list[PoliticalTransaction] = []
         seq = 0
@@ -491,19 +522,21 @@ class DemoMarket:
             )
 
         # P2 consensus: 3 politicians, both chambers, same name, recent.
-        consensus_ticker = pool[_seed("consensus", today.isoformat()) % len(pool)]
+        consensus_ticker = confirming[_seed("consensus", today.isoformat()) % len(confirming)]
         for i, pol in enumerate([POLITICIANS[0], POLITICIANS[3], POLITICIANS[7]]):
             emit(consensus_ticker, pol, txn_days_ago=26 - i * 5, lag_days=18, band_idx=1 + i % 3)
 
         # P3 repeat buyer: one politician, four purchases, no sales.
-        repeat_ticker = pool[_seed("repeat", today.isoformat()) % len(pool)]
+        repeat_ticker = confirming[
+            _seed("repeat", today.isoformat()) % len(confirming)
+        ]
         for i in range(4):
             emit(repeat_ticker, POLITICIANS[6], txn_days_ago=150 - i * 38, lag_days=21,
                  band_idx=2 + (i % 2))
 
         # P1 fresh purchases: a handful of recent single disclosures.
         for i in range(6):
-            t = pool[_seed("fresh", today.isoformat(), str(i)) % len(pool)]
+            t = confirming[_seed("fresh", today.isoformat(), str(i)) % len(confirming)]
             pol = POLITICIANS[(_seed("freshpol", str(i)) % len(POLITICIANS))]
             emit(t, pol, txn_days_ago=r.uniform(12, 30), lag_days=r.randint(9, 20),
                  band_idx=r.randint(0, 4),

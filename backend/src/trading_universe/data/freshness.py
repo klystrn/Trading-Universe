@@ -176,11 +176,23 @@ class FreshnessService:
 
         return (not blockers, blockers, states)
 
+    def required_sources(self) -> set[str]:
+        """Sources at least one enabled strategy actually depends on."""
+        cfg = get_config()
+        required: set[str] = set()
+        for strategy_id in cfg.strategies.enabled_strategies():
+            required.update(cfg.freshness.requirements(strategy_id)["required"])
+        return required
+
     def overall_status(self, now: datetime | None = None) -> FreshnessStatus:
         states = self.all_states(now)
         if not states:
             return FreshnessStatus.UNAVAILABLE
-        blocking = [s for s in states if s.blocking]
+        # Only sources something depends on can take the system down. A
+        # configured-but-unused feed going quiet is worth showing, not worth
+        # declaring an outage over.
+        required = self.required_sources()
+        blocking = [s for s in states if s.blocking and s.source in required]
         if any(s.status is FreshnessStatus.UNAVAILABLE for s in blocking):
             return FreshnessStatus.UNAVAILABLE
         if any(s.status is FreshnessStatus.STALE for s in blocking):

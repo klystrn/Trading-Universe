@@ -15,6 +15,8 @@ class TechnicalSnapshot(BaseModel):
     as_of: datetime
 
     close: float = 0.0
+    prev_close: float | None = None
+    change_pct: float = 0.0
     ema20: float | None = None
     dma50: float | None = None
     dma200: float | None = None

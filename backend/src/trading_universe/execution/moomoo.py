@@ -208,8 +208,9 @@ class MoomooMarketData(MarketDataProvider):
         if not value:
             return None
         try:
-            from dateutil import parser
             from zoneinfo import ZoneInfo
+
+            from dateutil import parser
 
             parsed = parser.parse(str(value))
             # OpenD reports US market times in US/Eastern without an offset.
@@ -236,7 +237,9 @@ class MoomooBroker(BrokerBase):
 
     name = "moomoo"
 
-    def __init__(self, paper: bool = True, host: str | None = None, port: int | None = None) -> None:
+    def __init__(
+        self, paper: bool = True, host: str | None = None, port: int | None = None
+    ) -> None:
         settings = get_settings()
         self.paper = paper
         self.host = host or settings.moomoo_host
@@ -387,7 +390,9 @@ class MoomooBroker(BrokerBase):
             price=order.limit_price,
             qty=order.quantity,
             code=MoomooMarketData.to_moomoo_symbol(order.ticker),
-            trd_side=sdk.TrdSide.BUY if order.side is OrderSide.BUY else sdk.TrdSide.SELL,
+            trd_side=(
+                sdk.TrdSide.BUY if order.side is OrderSide.BUY else sdk.TrdSide.SELL
+            ),
             order_type=sdk.OrderType.NORMAL,
             trd_env=self._trd_env,
             acc_id=self._acc_id,

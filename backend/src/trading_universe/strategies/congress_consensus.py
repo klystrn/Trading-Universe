@@ -10,8 +10,8 @@ and there isn't one yet.
 
 from __future__ import annotations
 
-from trading_universe.strategies.congress_purchase import PoliticalStrategy
 from trading_universe.strategies.base import StrategyContext, StrategyEvaluation
+from trading_universe.strategies.congress_purchase import PoliticalStrategy
 
 
 class CongressConsensus(PoliticalStrategy):

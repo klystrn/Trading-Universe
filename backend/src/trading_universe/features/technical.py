@@ -171,6 +171,10 @@ def build_technical_snapshot(
     close = df["close"]
     snap.close = float(close.iloc[-1])
     snap.volume = int(df["volume"].iloc[-1])
+    if len(close) > 1:
+        snap.prev_close = float(close.iloc[-2])
+        if snap.prev_close:
+            snap.change_pct = round((snap.close - snap.prev_close) / snap.prev_close, 6)
 
     ema20 = ema(close, 20)
     dma50 = sma(close, 50)

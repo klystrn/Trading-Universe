@@ -132,10 +132,9 @@ class CongressFreshPurchase(PoliticalStrategy):
         if age is None:
             failed.append("disclosure date unavailable")
         elif age <= max_age:
-            passed.append(
-                f"disclosed {age:.0f} day(s) ago "
-                f"(reporting lag {pol.newest_transaction_lag_days:.0f} days)"
-            )
+            lag = pol.newest_transaction_lag_days
+            lag_text = f" (reporting lag {lag:.0f} days)" if lag is not None else ""
+            passed.append(f"disclosed {age:.0f} day(s) ago{lag_text}")
         else:
             failed.append(f"newest disclosure {age:.0f} days old, older than {max_age}")
 

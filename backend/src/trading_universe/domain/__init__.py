@@ -87,6 +87,7 @@ __all__ = [
     "Subsector",
     "SystemHealth",
     "TechnicalSnapshot",
+    "Trade",
     "TradeParams",
     "TradeResult",
     "TradeThesis",

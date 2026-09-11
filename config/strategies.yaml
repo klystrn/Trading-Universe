@@ -1,12 +1,3 @@
-# ---------------------------------------------------------------------------
-# Strategy configuration (spec 9-16, 17, 66)
-#
-# Strategies are driven by configuration rather than hard-coded constants so the
-# sidebar controls map directly onto these keys. Anything a UI slider adjusts
-# should live here.
-# ---------------------------------------------------------------------------
-
-# --- Scoring weights (spec 8) ----------------------------------------------
 scoring:
   standard:
     technical: 40
@@ -19,28 +10,26 @@ scoring:
     sentiment: 20
     fundamental: 25
     minimum_score: 75
-
-# --- Reward/risk target laddering (spec 20) --------------------------------
 targets:
   minimum_reward_risk: 1.75
-  # If measured structure (prior swing high / resistance) supports a further
-  # target, the builder may extend to the largest rung that still sits below it.
-  extension_rungs: [2.0, 2.5, 3.0]
-
+  extension_rungs:
+  - 2.0
+  - 2.5
+  - 3.0
 strategies:
-
-  # -------------------------------------------------------------------------
   quality_momentum_pullback:
     enabled: true
     kind: standard
     label: Quality Momentum Pullback
     minimum_score: 70
-    holding_period_days: [2, 10]
+    holding_period_days:
+    - 2
+    - 10
     trend:
       require_price_above_50dma: true
       require_50dma_above_200dma: true
     pullback:
-      ema20_distance_pct: 2.0        # price within 2% of EMA20
+      ema20_distance_pct: 2.0
       allow_50dma_pullback: true
       dma50_distance_pct: 2.5
       max_drawdown_from_20d_high_pct: 12.0
@@ -50,7 +39,7 @@ strategies:
       require_rising: true
     confirmation:
       require_vwap_or_prior_high: true
-      min_volume_ratio: 1.0          # rebound volume vs 20d average
+      min_volume_ratio: 1.0
     sentiment:
       minimum_7d_score: 0.0
       window_days: 7
@@ -60,34 +49,34 @@ strategies:
       require_margin_not_deteriorating: true
       min_quality_score: 55
     stop:
-      method: swing_low              # swing_low | ema20_atr | structure
+      method: swing_low
       atr_buffer_mult: 0.5
       lookback_bars: 10
     reward_risk:
       minimum: 1.75
-
-  # -------------------------------------------------------------------------
   fundamental_catalyst_breakout:
     enabled: true
     kind: standard
     label: Fundamental Catalyst Breakout
     minimum_score: 70
-    holding_period_days: [1, 10]
+    holding_period_days:
+    - 1
+    - 10
     catalyst:
       lookback_sessions: 5
-      min_catalyst_strength: 0.5     # 0-1, from SEC item codes / news salience
+      min_catalyst_strength: 0.5
       accepted_types:
-        - EARNINGS
-        - GUIDANCE
-        - CONTRACT
-        - ACQUISITION
-        - PRODUCT
-        - REGULATORY
-        - MATERIAL_8K
+      - EARNINGS
+      - GUIDANCE
+      - CONTRACT
+      - ACQUISITION
+      - PRODUCT
+      - REGULATORY
+      - MATERIAL_8K
     technical:
-      breakout_lookback: 20          # break above 20-day high
+      breakout_lookback: 20
       min_volume_ratio: 1.5
-      max_extension_atr: 3.0         # reject if already >3 ATR above breakout
+      max_extension_atr: 3.0
       allow_retest_entry: true
     sentiment:
       minimum_24h_score: 0.15
@@ -102,14 +91,14 @@ strategies:
       atr_buffer_mult: 0.6
     reward_risk:
       minimum: 1.75
-
-  # -------------------------------------------------------------------------
   quality_oversold_reversal:
     enabled: true
     kind: standard
     label: Quality Oversold Reversal
     minimum_score: 70
-    holding_period_days: [2, 15]
+    holding_period_days:
+    - 2
+    - 15
     fundamentals:
       min_quality_score: 70
     rsi:
@@ -125,9 +114,12 @@ strategies:
       require_above_200dma: false
     sentiment:
       require_not_deteriorating: true
-      max_negative_7d: -0.6          # capitulation-level pessimism is rejected
+      max_negative_7d: -0.6
     reversal:
-      accept_patterns: [HIGHER_LOW, BULLISH_ENGULFING, VWAP_RECLAIM]
+      accept_patterns:
+      - HIGHER_LOW
+      - BULLISH_ENGULFING
+      - VWAP_RECLAIM
       min_patterns: 1
     volume:
       require_selling_volume_declining_or_reversal_expanding: true
@@ -137,19 +129,19 @@ strategies:
       atr_buffer_mult: 0.6
     reward_risk:
       minimum: 1.75
-
-  # -------------------------------------------------------------------------
   quality_volatility_squeeze:
     enabled: true
     kind: standard
     label: Quality Volatility Squeeze
     minimum_score: 70
-    holding_period_days: [2, 15]
+    holding_period_days:
+    - 2
+    - 15
     fundamentals:
       min_quality_score: 60
     squeeze:
-      bb_width_percentile_max: 15.0  # within lowest 15% of 3-month BB width
-      bb_width_lookback: 63          # ~3 months of sessions
+      bb_width_percentile_max: 15.0
+      bb_width_lookback: 63
       require_atr_contracting: true
       atr_contraction_lookback: 10
       require_volume_declining: true
@@ -163,23 +155,29 @@ strategies:
       breakout_lookback: 10
       min_volume_ratio: 1.4
     stop:
-      method: structure              # below the consolidation range
+      method: structure
       consolidation_lookback: 15
       atr_buffer_mult: 0.5
     reward_risk:
       minimum: 1.75
-
-  # -------------------------------------------------------------------------
   value_rerating_50dma_reclaim:
     enabled: true
     kind: standard
     label: Value Re-rating / 50DMA Reclaim
     minimum_score: 70
-    holding_period_days: [5, 30]
+    holding_period_days:
+    - 5
+    - 30
     fundamentals:
       min_quality_score: 60
-      min_value_percentile: 60.0     # top segment of screened universe
-      metrics: [fcf_yield, revenue_growth, operating_margin_trend, net_debt_to_ebitda, roe, dilution]
+      min_value_percentile: 60.0
+      metrics:
+      - fcf_yield
+      - revenue_growth
+      - operating_margin_trend
+      - net_debt_to_ebitda
+      - roe
+      - dilution
     location:
       require_recently_below_50dma: true
       recently_below_lookback: 20
@@ -191,37 +189,38 @@ strategies:
       rising_through: 50.0
       tolerance: 8.0
     sentiment:
-      min_7d_improvement: 0.10       # materially improving, not just positive
+      min_7d_improvement: 0.1
     stop:
       method: structure
       below_reclaim_buffer_pct: 1.0
       atr_buffer_mult: 0.6
     reward_risk:
       minimum: 1.75
-
-  # -------------------------------------------------------------------------
   congress_fresh_purchase:
     enabled: true
     kind: political
     label: Fresh Congressional Purchase
     minimum_score: 75
-    holding_period_days: [5, 40]
+    holding_period_days:
+    - 5
+    - 40
     political:
-      transaction_types: [PURCHASE]
-      max_disclosure_age_days: 21    # measured from DISCLOSURE date, not txn
+      transaction_types:
+      - PURCHASE
+      max_disclosure_age_days: 21
       min_amount_band_usd: 15000
       separate_member_and_spouse: true
       amount_band_score_curve:
         1000: 0.15
-        15000: 0.40
-        50000: 0.60
+        15000: 0.4
+        50000: 0.6
         100000: 0.75
-        250000: 0.90
-        500000: 1.00
+        250000: 0.9
+        500000: 1.0
     fundamentals:
       min_quality_score: 60
     sentiment:
-      minimum_7d_score: -0.05        # neutral or better
+      minimum_7d_score: -0.05
     technical:
       require_above_or_reclaiming_50dma: true
       reclaim_lookback: 5
@@ -233,22 +232,20 @@ strategies:
       atr_buffer_mult: 0.6
     reward_risk:
       minimum: 1.75
-
-  # -------------------------------------------------------------------------
   congress_consensus:
     enabled: true
     kind: political
     label: Congressional Consensus
     minimum_score: 75
-    holding_period_days: [5, 60]
+    holding_period_days:
+    - 5
+    - 60
     political:
       window_days: 30
       min_distinct_politicians: 2
-      chamber_overlap_bonus: 0.15    # House + Senate both represented
+      chamber_overlap_bonus: 0.15
       recency_half_life_days: 14
-      net_purchase_required: true    # sales inside the window subtract
-      # Deliberately NO committee-membership weighting: spec 15 requires a
-      # defensible, testable reason before any such weighting is added.
+      net_purchase_required: true
       committee_weighting: false
     fundamentals:
       min_quality_score: 60
@@ -263,25 +260,24 @@ strategies:
       atr_buffer_mult: 0.6
     reward_risk:
       minimum: 1.75
-
-  # -------------------------------------------------------------------------
   congress_repeat_buyer:
     enabled: true
     kind: political
     label: Repeat High-Conviction Buyer
     minimum_score: 75
-    holding_period_days: [5, 60]
+    holding_period_days:
+    - 5
+    - 60
     political:
       window_days: 180
       min_purchases: 3
       require_no_sales: true
-      # Weights from spec 16. Must sum to 1.0.
       subscore_weights:
-        recency: 0.30
+        recency: 0.3
         repeat_frequency: 0.25
-        transaction_size: 0.20
+        transaction_size: 0.2
         no_recent_sales: 0.15
-        historical_follow_through: 0.10
+        historical_follow_through: 0.1
       recency_half_life_days: 30
     fundamentals:
       min_quality_score: 60
@@ -296,13 +292,23 @@ strategies:
       atr_buffer_mult: 0.6
     reward_risk:
       minimum: 1.75
-
-# --- Regime -> preferred strategy mapping (spec 7) -------------------------
 regime_preferences:
-  STRONG_BULL:  [quality_momentum_pullback, quality_volatility_squeeze]
-  BULL:         [quality_momentum_pullback, fundamental_catalyst_breakout]
-  NEUTRAL:      [quality_volatility_squeeze, value_rerating_50dma_reclaim]
-  HIGH_VOLATILITY: [fundamental_catalyst_breakout, quality_oversold_reversal]
-  CORRECTION:   [quality_oversold_reversal, congress_consensus]
-  RECOVERY:     [quality_oversold_reversal, value_rerating_50dma_reclaim]
-  RISK_OFF:     []            # mostly cash - extremely selective
+  STRONG_BULL:
+  - quality_momentum_pullback
+  - quality_volatility_squeeze
+  BULL:
+  - quality_momentum_pullback
+  - fundamental_catalyst_breakout
+  NEUTRAL:
+  - quality_volatility_squeeze
+  - value_rerating_50dma_reclaim
+  HIGH_VOLATILITY:
+  - fundamental_catalyst_breakout
+  - quality_oversold_reversal
+  CORRECTION:
+  - quality_oversold_reversal
+  - congress_consensus
+  RECOVERY:
+  - quality_oversold_reversal
+  - value_rerating_50dma_reclaim
+  RISK_OFF: []
