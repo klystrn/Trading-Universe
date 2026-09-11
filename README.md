@@ -26,6 +26,27 @@ DATA  ->  FEATURES  ->  STRATEGIES  ->  SCORER  ->  REGIME SELECTOR
 The platform ships with a deterministic synthetic market, so everything below
 works offline before a single API key exists.
 
+> **GitHub Pages only shows this README.** The universe is a Next.js app that
+> talks to the Python backend over HTTP and a WebSocket, so both run on your
+> own machine (Python 3.11+ and Node 18+). Once they are up, open
+> **http://localhost:3000**.
+
+Quickest path, from the repo root:
+
+```powershell
+# Windows
+pip install -e ".\backend[dev]"
+.\scripts\dev.ps1
+```
+
+```bash
+# macOS / Linux
+pip install -e "./backend[dev]"
+./scripts/dev.sh
+```
+
+Or by hand:
+
 ```bash
 # backend
 cd backend
