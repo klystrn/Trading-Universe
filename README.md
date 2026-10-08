@@ -1,8 +1,21 @@
 # Trading Universe
 
 A modular swing-trading bot and research platform behind a Jarvis-style HUD:
-a reactive core, the five questions that matter as readouts around it, and a
-command line that takes text or voice. Panels exist only when summoned.
+the market drawn as one slowly turning spiral galaxy, the five questions that
+matter as readouts around it, and a command line that takes text or voice.
+Panels exist only when summoned.
+
+Every stock is a star on the galaxy's arms, one arm segment per sector. A
+star's brightness follows the stock's activity, its tint the day's move
+(blue-white up, amber down), live setups twinkle, and held positions carry
+diffraction spikes. Hover a star for its card; click it for the chart. The disc
+turns faster in a strong tape, the nucleus brightens while the assistant
+listens or speaks, and everything dims when the kill switch is engaged.
+
+The galaxy is a single pre-rendered image (`scripts/render_galaxy.py`: an
+exponential disc, logarithmic arms broken up by turbulence, star-forming knots,
+reddening dust lanes and an asinh stretch) rotated on a plain 2D canvas, so it
+costs one draw per frame and needs no WebGL.
 
 Say or type *briefing*, *show signals*, *chart NVDA*, *why did the bot reject
 NVDA?*, *use recommendation*, *override to oversold reversal*, *stop all
@@ -13,7 +26,7 @@ improvised. Underneath, a strictly layered trading engine scans the S&P 500 +
 Nasdaq 100 with eight explainable strategies, scores every setup, and hands
 each one to an independent risk engine that is the only path to an order.
 
-The earlier 3D universe (sectors as spiral galaxies, stocks as stars) lives in
+The earlier WebGL universe (each sector its own galaxy) lives in
 `archive/universe/` - see its README to revive it.
 
 ```
@@ -23,7 +36,7 @@ DATA  ->  FEATURES  ->  STRATEGIES  ->  SCORER  ->  REGIME SELECTOR
                                                         |
                                                 EXECUTION (advisory | paper | live)
                                                         |
-                                                 SQLite  +  WebSocket  ->  3D universe
+                                                 SQLite  +  WebSocket  ->  galaxy HUD
 ```
 
 ## Run it in five minutes (no accounts needed)

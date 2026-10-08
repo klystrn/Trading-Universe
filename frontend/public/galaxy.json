@@ -1,0 +1,10 @@
+{
+  "arms": 2,
+  "pitch_deg": 17.0,
+  "arm_r0": 0.07,
+  "arm_phase": 0.0,
+  "disk_scale": 0.28,
+  "arm_r_min": 0.1,
+  "arm_r_max": 0.66,
+  "note": "radii are fractions of the image half-width; theta=atan2(y, x) with +y pointing down the image"
+}

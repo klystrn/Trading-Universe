@@ -8,15 +8,16 @@
  *  summoned. No WebGL.
  */
 
-import { useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { CommandLine } from "@/components/hud/CommandLine";
-import { Core } from "@/components/hud/Core";
+import { Galaxy, type HoveredStar } from "@/components/hud/Galaxy";
 import { StatusReadouts } from "@/components/hud/StatusReadouts";
 import { Summon } from "@/components/hud/Summon";
+import { api } from "@/lib/api";
 import { UniverseSocket, type Envelope } from "@/lib/ws";
 import { useHudStore } from "@/stores/useHudStore";
 import { useTradingStore } from "@/stores/useTradingStore";
-import type { Briefing, Signal, SystemHealth } from "@/lib/types";
+import type { Briefing, Signal, SystemHealth, UniversePayload } from "@/lib/types";
 
 export default function Page() {
   const refreshAll = useTradingStore((s) => s.refreshAll);
@@ -26,6 +27,22 @@ export default function Page() {
   const wakeStage = useTradingStore((s) => s.wakeStage);
   const openPanel = useTradingStore((s) => s.openPanel);
   const setConnected = useHudStore((s) => s.setConnected);
+  const openChartFor = useTradingStore((s) => s.openChartFor);
+  const signalsGeneratedAt = useTradingStore((s) => s.signalsGeneratedAt);
+  const [universe, setUniverse] = useState<UniversePayload | null>(null);
+  const [hovered, setHovered] = useState<HoveredStar | null>(null);
+
+  // The galaxy's stars: reloaded whenever a scan lands, and every 30 s for
+  // the day's moves. Failures keep the last good sky.
+  const loadUniverse = useCallback(() => {
+    api.universe().then(setUniverse).catch(() => undefined);
+  }, []);
+  useEffect(() => {
+    if (waking) return;
+    loadUniverse();
+    const timer = setInterval(loadUniverse, 30_000);
+    return () => clearInterval(timer);
+  }, [waking, signalsGeneratedAt, loadUniverse]);
 
   useEffect(() => {
     void boot();
@@ -54,9 +71,6 @@ export default function Page() {
 
   return (
     <main className="relative h-screen w-screen overflow-hidden bg-void">
-      {/* Ground: a faint radial so the black has depth without colour. */}
-      <div className="pointer-events-none absolute inset-0"
-           style={{ background: "radial-gradient(ellipse at 50% 45%, rgba(20,27,43,0.9) 0%, #05070d 60%)" }} />
 
       <header className="pointer-events-none absolute left-6 top-5 z-20">
         <p className="font-mono text-[11px] uppercase tracking-[0.42em] text-ink">Trading Universe</p>
@@ -67,9 +81,11 @@ export default function Page() {
           panel's width, so readouts reflow rather than slide off-screen. */}
       <div className="absolute inset-y-0 left-0 transition-[right] duration-500 ease-calm"
            style={{ right: openPanel ? "min(460px, calc(100vw - 2rem))" : 0 }}>
-        <div className="absolute left-1/2 top-[40%] -translate-x-1/2 -translate-y-1/2">
-          <Core />
-        </div>
+        <Galaxy universe={universe} onHover={setHovered} onPick={openChartFor} />
+        {hovered && <StarCard star={hovered} />}
+        {/* Overlays let the pointer through to the galaxy except where they
+            need it (the command line opts back in). */}
+        <div className="pointer-events-none absolute inset-0">
         {waking && (
           <div className="pointer-events-none absolute left-1/2 top-[63%] z-20 -translate-x-1/2 text-center"
                data-testid="waking">
@@ -85,6 +101,7 @@ export default function Page() {
         <div className="pointer-events-none absolute inset-x-0 bottom-6 z-20 flex justify-center px-4">
           <CommandLine />
         </div>
+        </div>
       </div>
 
       <Summon />
@@ -95,5 +112,30 @@ export default function Page() {
         </div>
       )}
     </main>
+  );
+}
+
+function StarCard({ star }: { star: HoveredStar }) {
+  const e = star.entity;
+  const change = (e.price_change ?? 0) * 100; // payload carries a fraction
+  return (
+    <div className="pointer-events-none absolute z-30 -translate-x-1/2 rounded-lg border border-white/10 bg-black/60 px-3 py-2 font-mono text-[10px] backdrop-blur-glass"
+         style={{ left: star.x, top: star.y + 14 }}>
+      <p className="text-[12px] tracking-[0.12em] text-ink">
+        {e.id}{" "}
+        <span className={change >= 0 ? "text-up" : "text-down"}>
+          {change >= 0 ? "+" : ""}{change.toFixed(2)}%
+        </span>
+      </p>
+      <p className="text-ink-faint">{e.name}</p>
+      <p className="mt-0.5 uppercase tracking-[0.18em] text-ink-faint">{star.sectorLabel}</p>
+      {e.signal?.active && (
+        <p className="mt-0.5 text-accent">
+          setup {Math.round(e.signal.score)} · {e.signal.executable ? "executable" : "watch"}
+        </p>
+      )}
+      {e.portfolio?.held && <p className="mt-0.5 text-ink">held · {e.portfolio.pnl_pct.toFixed(1)}%</p>}
+      <p className="mt-1 text-ink-faint">click for chart</p>
+    </div>
   );
 }

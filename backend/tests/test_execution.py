@@ -9,6 +9,7 @@ from trading_universe.domain.enums import (
     OrderSide,
     OrderStatus,
     OrderType,
+    Session,
     TradeResult,
 )
 from trading_universe.domain.portfolio import Order
@@ -111,7 +112,9 @@ class TestExecutionEngine:
         engine = ExecutionEngine(
             paper_broker, RiskEngine(config, freshness), OperatingMode.ADVISORY
         )
-        ctx = engine.build_context(technical=liquid_technical, quote=tight_quote)
+        ctx = engine.build_context(
+            technical=liquid_technical, quote=tight_quote, session=Session.REGULAR
+        )
         decision, order, thesis = engine.process(sample_signal, ctx)
 
         assert decision.allowed          # it qualifies...
@@ -122,7 +125,9 @@ class TestExecutionEngine:
     def test_paper_auto_places_an_order(
         self, engine, paper_broker, sample_signal, liquid_technical, tight_quote
     ):
-        ctx = engine.build_context(technical=liquid_technical, quote=tight_quote)
+        ctx = engine.build_context(
+            technical=liquid_technical, quote=tight_quote, session=Session.REGULAR
+        )
         decision, order, thesis = engine.process(sample_signal, ctx)
         assert decision.allowed
         assert order is not None
@@ -135,7 +140,9 @@ class TestExecutionEngine:
     ):
         """Spec 21: rejected signals are recorded, not dropped."""
         config.risk.set("max_open_positions", 0)
-        ctx = engine.build_context(technical=liquid_technical, quote=tight_quote)
+        ctx = engine.build_context(
+            technical=liquid_technical, quote=tight_quote, session=Session.REGULAR
+        )
         decision, order, thesis = engine.process(sample_signal, ctx)
 
         assert not decision.allowed
@@ -151,7 +158,9 @@ class TestExecutionEngine:
             "rsi14": 52.4, "volume_ratio": 1.37, "quality_score": 81.0,
             "sentiment_trend": "improving", "consensus_score": 0.4,
         }
-        ctx = engine.build_context(technical=liquid_technical, quote=tight_quote)
+        ctx = engine.build_context(
+            technical=liquid_technical, quote=tight_quote, session=Session.REGULAR
+        )
         _, _, thesis = engine.process(sample_signal, ctx)
 
         assert thesis.entry == 100.0
@@ -167,7 +176,9 @@ class TestExecutionEngine:
         self, engine, paper_broker, sample_signal, liquid_technical, tight_quote
     ):
         engine.engage_kill_switch()
-        ctx = engine.build_context(technical=liquid_technical, quote=tight_quote)
+        ctx = engine.build_context(
+            technical=liquid_technical, quote=tight_quote, session=Session.REGULAR
+        )
         decision, order, _ = engine.process(sample_signal, ctx)
         assert not decision.allowed
         assert order is None
@@ -196,7 +207,7 @@ class TestExecutionEngine:
             )
             technical = liquid_technical.model_copy(update={"ticker": ticker})
             quote = tight_quote.model_copy(update={"ticker": ticker})
-            ctx = engine.build_context(technical=technical, quote=quote)
+            ctx = engine.build_context(technical=technical, quote=quote, session=Session.REGULAR)
             engine.process(signal, ctx)
 
         assert len(paper_broker.get_positions()) <= config.risk.max_new_trades_per_day
